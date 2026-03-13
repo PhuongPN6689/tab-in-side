@@ -4,11 +4,11 @@
   "version": "1.0",
   "description": "Open any website or link in a mobile-view sidebar in Firefox.",
   "author": "Antigravity UI",
-  "homepage_url": "https://github.com/phuong/tab-in-side",
+  "homepage_url": "https://github.com/PhuongPN6689/tab-in-side",
   "icons": {
-    "48": "icons/icon.png",
-    "96": "icons/icon.png",
-    "128": "icons/icon.png"
+    "48": "icons/icon.jpg",
+    "96": "icons/icon.jpg",
+    "128": "icons/icon.jpg"
   },
   "permissions": [
     "menus",
@@ -20,12 +20,14 @@
     "<all_urls>"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
   "sidebar_action": {
     "default_panel": "sidebar/sidebar.html",
-    "default_title": "Tab-in-Side",
-    "default_icon": "icons/icon.png"
+    "default_title": "Tab in Side",
+    "default_icon": "icons/icon.jpg"
   },
   "options_ui": {
     "page": "options/options.html",
