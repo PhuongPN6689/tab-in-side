@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tab-in-Side Options</title>
+    <style>
+        :root {
+            --primary: #0060df;
+            --primary-hover: #003eaa;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text: #212529;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            padding: 40px 20px; 
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 { margin-top: 0; font-size: 24px; color: var(--primary); }
+        h2 { font-size: 18px; margin: 30px 0 15px; border-bottom: 2px solid var(--bg); padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        input[type="text"] { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .quick-access-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 40px;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .header-row label { margin-bottom: 0; }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        button { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        #save-btn {
+            background: var(--primary); 
+            color: white; 
+        }
+        #save-btn:hover { background: var(--primary-hover); }
+        
+        .secondary-btn {
+            background: #e9ecef;
+            color: #495057;
+            font-size: 13px;
+        }
+        .secondary-btn:hover { background: #dee2e6; }
+        .secondary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .delete-btn {
+            background: transparent;
+            color: #dc3545;
+            font-size: 20px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn:hover { color: #a71d2a; }
+
+        .status {
+            margin-right: 15px;
+            font-size: 14px;
+            color: #28a745;
+            display: none;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tab-in-Side Settings</h1>
+        
+        <div class="form-group">
+            <label for="default-url">Default Entry Page (Sidebar Home)</label>
+            <input type="text" id="default-url" placeholder="https://www.google.com">
+            <div class="help-text">This page will load when you open the sidebar without a specific link.</div>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; background: #eef2f7; padding: 15px; border-radius: 8px;">
+            <div>
+                <label style="margin-bottom: 0;">Mobile View Mode</label>
+                <div class="help-text">Automatically spoof a mobile display in the Sidebar.</div>
+            </div>
+            <input type="checkbox" id="mobile-view-toggle" style="width: 20px; height: 20px;">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding: 0 15px;">
+            <div>
+                <label style="margin-bottom: 0;">Recent History Limit</label>
+                <div class="help-text">Maximum number of recent "Open in Sidebar" URLs to show.</div>
+            </div>
+            <input type="number" id="history-limit" min="1" max="10" value="3" style="width: 60px; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+        </div>
+
+        <h2>Quick Access Buttons</h2>
+        <div id="quick-urls-container">
+            <div class="quick-access-row header-row">
+                <label>Display Name</label>
+                <label>Target URL</label>
+                <span></span>
+            </div>
+            <!-- Rows will be injected by options.js -->
+        </div>
+
+        <button id="add-btn" class="secondary-btn" style="margin-top: 10px;">+ Add New Button</button>
+        <div class="help-text" style="margin-top: 8px;">Maximum 5 buttons allowed.</div>
+
+        <div class="actions">
+            <div id="status" class="status">Settings saved successfully!</div>
+            <button id="save-btn">Save Settings</button>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

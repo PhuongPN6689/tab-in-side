@@ -1,0 +1,94 @@
+:root {
+    --toolbar-bg: #f9f9fb;
+    --toolbar-border: #e0e0e0;
+    --btn-hover: #ececf1;
+    --btn-active: #dfdfe6;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+.toolbar {
+    height: 44px;
+    background: var(--toolbar-bg);
+    border-bottom: 1px solid var(--toolbar-border);
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+    gap: 2px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #4b4b4b;
+    transition: background 0.2s;
+    padding: 0;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    object-fit: contain;
+}
+
+.v-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--toolbar-border);
+    margin: 0 4px;
+}
+
+.divider {
+    flex-grow: 1;
+}
+
+#settings-btn {
+    opacity: 0.6;
+}
+
+#settings-btn:hover {
+    opacity: 1;
+}
+
+.nav-btn:hover {
+    background: var(--btn-hover);
+}
+
+.nav-btn:active {
+    background: var(--btn-active);
+}
+
+.content {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+}
+
+#main-frame {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+}

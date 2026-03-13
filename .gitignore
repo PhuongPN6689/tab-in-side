@@ -1,0 +1,18 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Extension builds
+*.zip
+
+# Agent files
+.gemini/
+brain/
+implementation_plan.md
+task.md
+walkthrough.md
