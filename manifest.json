@@ -36,8 +36,13 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-in-side@antigravity.ai",
-      "strict_min_version": "113.0",
-      "data_collection_permissions": {}
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": {
+          "personalData": "none",
+          "technicalAndInteractionData": "none"
+        }
+      }
     }
   }
 }
