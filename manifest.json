@@ -14,7 +14,9 @@
     "menus",
     "storage",
     "declarativeNetRequest",
-    "bookmarks"
+    "bookmarks",
+    "webRequest",
+    "webRequestBlocking"
   ],
   "host_permissions": [
     "<all_urls>"

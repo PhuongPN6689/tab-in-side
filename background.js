@@ -10,27 +10,7 @@ async function updateNetRules() {
   const data = await browser.storage.local.get('mobile_view');
   const mobileViewEnabled = data.mobile_view !== false; // Default to true
 
-  const rules = [];
-  
-  // Rule 1: Header Bypass (Always enabled for core functionality)
-  rules.push({
-    id: 1,
-    priority: 1,
-    action: {
-      type: "modifyHeaders",
-      responseHeaders: [
-        { header: "X-Frame-Options", operation: "remove" },
-        { header: "Frame-Options", operation: "remove" },
-        { header: "Content-Security-Policy", operation: "remove" }
-      ]
-    },
-    condition: {
-      initiatorDomains: [new URL(EXTENSION_ORIGIN).hostname],
-      resourceTypes: ["sub_frame", "main_frame", "xmlhttprequest", "script", "stylesheet"]
-    }
-  });
-
-  // Rule 2: User-Agent Spoofing (Only if enabled)
+  // Only applying User-Agent spoofing via DNR
   if (mobileViewEnabled) {
     rules.push({
       id: 2,
@@ -54,10 +34,27 @@ async function updateNetRules() {
 
   // Apply rules (Dynamic rules persist across restarts)
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [1, 2],
+    removeRuleIds: [2],
     addRules: rules
   });
 }
+
+// Intercept headers using webRequest API to bypass frame restrictions robustly
+browser.webRequest.onHeadersReceived.addListener(
+  (details) => {
+    // We only care about sub_frame (iframe) requests
+    if (details.type === 'sub_frame') {
+      const responseHeaders = details.responseHeaders.filter(header => {
+        const name = header.name.toLowerCase();
+        return name !== 'x-frame-options' && name !== 'frame-options' && name !== 'content-security-policy';
+      });
+      return { responseHeaders };
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["blocking", "responseHeaders"]
+);
+
 
 // Create context menu items on installation
 browser.runtime.onInstalled.addListener(async () => {
