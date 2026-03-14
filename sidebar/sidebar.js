@@ -7,6 +7,45 @@ const settingsBtn = document.getElementById('settings-btn');
 // State
 let quickUrls = [];
 let historyUrls = [];
+let mobileViewEnabled = true;
+
+const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
+
+// 1. Override User-Agent for rendering mobile version in sidebar
+browser.webRequest.onBeforeSendHeaders.addListener(
+  (details) => {
+    // Target only iframe requests inside our sidebar context (tabId: -1)
+    if (details.tabId === -1 && details.type === 'sub_frame') {
+      if (mobileViewEnabled) {
+        for (let header of details.requestHeaders) {
+          if (header.name.toLowerCase() === 'user-agent') {
+            header.value = MOBILE_USER_AGENT;
+            break;
+          }
+        }
+      }
+      return { requestHeaders: details.requestHeaders };
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["blocking", "requestHeaders"]
+);
+
+// 2. Bypass X-Frame-Options to allow embedding any site in the sidebar
+browser.webRequest.onHeadersReceived.addListener(
+  (details) => {
+    // Target only iframe requests inside our sidebar context (tabId: -1)
+    if (details.tabId === -1 && details.type === 'sub_frame') {
+      const responseHeaders = details.responseHeaders.filter(header => {
+        const name = header.name.toLowerCase();
+        return name !== 'x-frame-options' && name !== 'frame-options' && name !== 'content-security-policy';
+      });
+      return { responseHeaders };
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["blocking", "responseHeaders"]
+);
 
 /**
  * Update the iframe source
@@ -80,8 +119,10 @@ function updateButtonUI() {
  * Load initial state from storage
  */
 async function initSidebar() {
-  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history']);
+  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view']);
   
+  mobileViewEnabled = data.mobile_view !== false; // Default to true
+
   if (data.quick_urls) {
     quickUrls = data.quick_urls;
   } else {
@@ -132,6 +173,9 @@ browser.storage.onChanged.addListener((changes, area) => {
     if (changes.history) {
       historyUrls = changes.history.newValue;
       updateButtonUI();
+    }
+    if (changes.mobile_view) {
+      mobileViewEnabled = changes.mobile_view.newValue !== false;
     }
   }
 });
