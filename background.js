@@ -52,8 +52,8 @@ async function updateNetRules() {
     });
   }
 
-  // Apply rules (Session rules are cleaner for dynamic updates)
-  await browser.declarativeNetRequest.updateSessionRules({
+  // Apply rules (Dynamic rules persist across restarts)
+  await browser.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [1, 2],
     addRules: rules
   });
