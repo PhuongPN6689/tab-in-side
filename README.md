@@ -6,7 +6,7 @@
 **Tab in Side** is a powerful Firefox extension designed to make multitasking seamless. It allows you to open any website, link, or bookmark directly within your browser's sidebar, complete with a mobile-spoofed interface for better fit and accessibility.
 
 <p align="center">
-  <img alt="Tab in Side Logo" src="icons/icon.svg" width="128">
+  <img alt="Tab in Side Logo" src="icons/icon.svg" width="256">
   <br>
   <span style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Tab in Side</span>
 </p>
@@ -15,11 +15,11 @@
 
 | Feature | Screenshot |
 | :--- | :--- |
-| **Open in side** | ![Open in side](assets/screenshot_1.jpg) |
-| **Right click to open** | ![Right click to open](assets/screenshot_2.jpg) |
-| **Bookmark Context Menu** | ![Bookmark Context Menu](assets/screenshot_3.jpg) |
-| **Quick Access & History** | ![Quick Access & History](assets/screenshot_5.jpg) |
-| **Open source** | ![Open source](assets/screenshot_4.jpg) |
+| **Seamless Sidebar Integration**: Enhance your productivity with side-by-side browsing. Open any webpage or perform quick searches directly within the sidebar. This allows you to cross-reference data, look up definitions, or watch tutorials while staying focused on your primary workspace. | ![Seamless Sidebar Integration](assets/screenshot_1.jpg) |
+| **Instant Context Menu Access**: Transform your right-click into a powerful navigation tool. Simply right-click anywhere on a webpage or on a specific link to instantly beam that content to the sidebar. It eliminates the hassle of tab-switching and keeps your workflow fluid and uninterrupted. | ![Instant Context Menu Access](assets/screenshot_2.jpg) |
+| **Direct Bookmark Launch**: Your favorites are now just a click away. We’ve integrated Tab-in-Side directly into your Firefox Bookmarks. Right-click any saved bookmark to open it immediately in the side panel, making your most-used resources available without cluttering your tab bar. | ![Direct Bookmark Launch](assets/screenshot_3.jpg) |
+| **Quick Access & History Management**: Personalize your dashboard for maximum efficiency. Use the settings page to configure up to 5 high-priority quick-access links. You can also manage your browsing trail by adjusting the history limit, ensuring your most recently visited pages are always ready for a quick revisit. | ![Quick Access & History Management](assets/screenshot_4.jpg) |
+| **Transparent & Open Source**: Built with trust and community in mind. Tab-in-Side is fully open-source. You can explore, audit, or contribute to the entire codebase on GitHub. We believe in transparency and welcome developers to help us make the extension even better. | ![Transparent & Open Source](assets/screenshot_5.jpg) |
 
 ## ✨ Core Capabilities
 
