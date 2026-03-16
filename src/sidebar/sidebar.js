@@ -8,6 +8,7 @@ const settingsBtn = document.getElementById('settings-btn');
 let quickUrls = [];
 let historyUrls = [];
 let mobileViewEnabled = true;
+let zoomLevel = 90;
 
 const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
 
@@ -52,11 +53,31 @@ browser.webRequest.onHeadersReceived.addListener(
 /**
  * Update the iframe source
  * @param {string} url 
+ * @param {number} [specificZoom] 
  */
-function updateIframe(url) {
+function updateIframe(url, specificZoom) {
   if (url && url !== iframe.src) {
     iframe.src = url;
+    
+    // Use specific zoom or fallback to global zoomLevel
+    const activeZoom = specificZoom || zoomLevel;
+    
+    // Delay applying zoom to ensure iframe content starts loading
+    setTimeout(() => applyZoom(activeZoom), 100);
   }
+}
+
+/**
+ * Apply zoom level to the iframe
+ * @param {number} level 
+ */
+function applyZoom(level) {
+  if (!iframe) return;
+  const scale = level / 100;
+  iframe.style.transform = `scale(${scale})`;
+  iframe.style.transformOrigin = '0 0';
+  iframe.style.width = `${100 / scale}%`;
+  iframe.style.height = `${100 / scale}%`;
 }
 
 /**
@@ -75,7 +96,7 @@ function getFaviconUrl(url) {
 /**
  * Helper to create a toolbar button
  */
-function createToolbarButton(title, url, isHistory = false) {
+function createToolbarButton(title, url, isHistory = false, zoom = null, mobile = null) {
   const btn = document.createElement('button');
   btn.className = 'nav-btn';
   if (isHistory) btn.style.opacity = '0.8';
@@ -87,7 +108,14 @@ function createToolbarButton(title, url, isHistory = false) {
   img.alt = '';
   
   btn.appendChild(img);
-  btn.onclick = () => updateIframe(url);
+  btn.onclick = async () => {
+    // If specific view mode is set, update global mobile_view toggle
+    // This will trigger background.js updateNetRules via storage listener
+    if (mobile !== null) {
+      await browser.storage.local.set({ mobile_view: mobile });
+    }
+    updateIframe(url, zoom);
+  };
   return btn;
 }
 
@@ -99,7 +127,7 @@ function updateButtonUI() {
   quickBtnsContainer.innerHTML = '';
   quickUrls.forEach((item) => {
     if (item.url) {
-      const btn = createToolbarButton(item.name || 'Quick Access', item.url);
+      const btn = createToolbarButton(item.name || 'Quick Access', item.url, false, item.zoom, item.mobile);
       quickBtnsContainer.appendChild(btn);
     }
   });
@@ -121,20 +149,19 @@ function updateButtonUI() {
  * Load initial state from storage
  */
 async function initSidebar() {
-  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view']);
+  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level']);
   
   mobileViewEnabled = data.mobile_view !== false; // Default to true
+  zoomLevel = data.zoom_level || 90;
 
   if (data.quick_urls) {
     quickUrls = data.quick_urls;
   } else {
     // Fallback if not set yet
     quickUrls = [
-      { name: 'Google', url: 'https://www.google.com' },
-      { name: 'Wikipedia', url: 'https://www.wikipedia.org' },
-      { name: 'GitHub', url: 'https://github.com' },
-      { name: 'StackOverflow', url: 'https://stackoverflow.com' },
-      { name: 'YouTube', url: 'https://www.youtube.com' }
+      { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
+      { name: 'GG Dịch', url: 'https://translate.google.com', zoom: 90, mobile: true },
+      { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
     ];
   }
 
@@ -178,6 +205,10 @@ browser.storage.onChanged.addListener((changes, area) => {
     }
     if (changes.mobile_view) {
       mobileViewEnabled = changes.mobile_view.newValue !== false;
+    }
+    if (changes.zoom_level) {
+      zoomLevel = changes.zoom_level.newValue || 90;
+      applyZoom(zoomLevel);
     }
   }
 });
