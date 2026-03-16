@@ -36,6 +36,12 @@
 3. Click **Load Temporary Add-on...**.
 4. Select the `manifest.json` file from the project folder.
 
+### Build to zip
+
+```bash
+npx web-ext build --config web-ext-config.cjs
+```
+
 ### For Users (Once Published)
 Install directly from the [Firefox Add-on Store](https://addons.mozilla.org/).
 
