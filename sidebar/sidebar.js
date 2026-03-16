@@ -11,7 +11,9 @@ let mobileViewEnabled = true;
 
 const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
 
-// 1. Override User-Agent for rendering mobile version in sidebar
+// Header modifications are now centrally managed in background.js via declarativeNetRequest
+// for better reliability and performance in MV3.
+/*
 browser.webRequest.onBeforeSendHeaders.addListener(
   (details) => {
     // Target only iframe requests inside our sidebar context (tabId: -1)
@@ -31,7 +33,6 @@ browser.webRequest.onBeforeSendHeaders.addListener(
   ["blocking", "requestHeaders"]
 );
 
-// 2. Bypass X-Frame-Options to allow embedding any site in the sidebar
 browser.webRequest.onHeadersReceived.addListener(
   (details) => {
     // Target only iframe requests inside our sidebar context (tabId: -1)
@@ -46,6 +47,7 @@ browser.webRequest.onHeadersReceived.addListener(
   { urls: ["<all_urls>"] },
   ["blocking", "responseHeaders"]
 );
+*/
 
 /**
  * Update the iframe source

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab-in-Side",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Open any website or link in a mobile-view sidebar in Firefox.",
   "author": "Antigravity UI",
   "homepage_url": "https://github.com/PhuongPN6689/tab-in-side",

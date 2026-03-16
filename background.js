@@ -10,7 +10,26 @@ async function updateNetRules() {
   const data = await browser.storage.local.get('mobile_view');
   const mobileViewEnabled = data.mobile_view !== false; // Default to true
 
-  // Only applying User-Agent spoofing via DNR
+  const rules = [];
+
+  // Rule 1: Strip X-Frame-Options and Content-Security-Policy
+  rules.push({
+    id: 1,
+    priority: 1,
+    action: {
+      type: "modifyHeaders",
+      responseHeaders: [
+        { header: "X-Frame-Options", operation: "remove" },
+        { header: "Frame-Options", operation: "remove" },
+        { header: "Content-Security-Policy", operation: "remove" }
+      ]
+    },
+    condition: {
+      resourceTypes: ["sub_frame"]
+    }
+  });
+
+  // Rule 2: User-Agent spoofing for mobile view
   if (mobileViewEnabled) {
     rules.push({
       id: 2,
@@ -34,15 +53,17 @@ async function updateNetRules() {
 
   // Apply rules (Dynamic rules persist across restarts)
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [2],
+    removeRuleIds: [1, 2],
     addRules: rules
   });
 }
 
 // Intercept headers using webRequest API to bypass frame restrictions robustly
+// No longer need manual webRequest onHeadersReceived in background.js 
+// as declarativeNetRequest handles it more efficiently.
+/*
 browser.webRequest.onHeadersReceived.addListener(
   (details) => {
-    // We only care about sub_frame (iframe) requests
     if (details.type === 'sub_frame') {
       const responseHeaders = details.responseHeaders.filter(header => {
         const name = header.name.toLowerCase();
@@ -54,6 +75,7 @@ browser.webRequest.onHeadersReceived.addListener(
   { urls: ["<all_urls>"] },
   ["blocking", "responseHeaders"]
 );
+*/
 
 
 // Create context menu items on installation
