@@ -7,14 +7,14 @@
 
 ![Tab-in-Side Logo](icons/icon.jpg)
 
-## ✨ Key Features
+## ✨ Core Capabilities
 
-- **Context Menu Integration**: Right-click any link, page, or bookmark and select *"Open in Tab-in-Side"*.
-- **Mobile View Mode**: Automatically spoofs an iPhone User-Agent for websites in the sidebar, ensuring they look great even in a narrow space.
-- **Header Bypass**: Strips `X-Frame-Options` and modifies `Content-Security-Policy` so you can embed tricky sites like YouTube, Facebook, and GitHub.
-- **Dynamic Quick Access**: Add up to 5 of your favorite sites to the sidebar toolbar.
-- **Recent History**: Keep track of your last $n$ visited sidebar pages for quick switching.
-- **Direct Settings**: Access the configuration page directly from the sidebar.
+- **Seamless Context Menu Integration**: Effortlessly open any hyperlink, current webpage, or saved bookmark directly into your browser's sidebar with a single right-click. No more switching tabs for quick lookups.
+- **Advanced Header Bypassing (DNR)**: Powered by `declarativeNetRequest`, Tab-in-Side strips restrictive security headers like `X-Frame-Options`, `Frame-Options`, and `Content-Security-Policy`. This enables the embedding of previously "unframeable" sites such as **m.genk.vn**, **YouTube**, **Facebook**, and **GitHub**.
+- **Intelligent Mobile Spoofing**: Automatically simulates a mobile device environment (iPhone User-Agent) within the sidebar. This forces websites to render their specialized mobile layouts, providing a perfectly optimized and readable experience in the narrow sidebar space.
+- **Customizable Quick Access**: Features a dynamic toolbar where you can pin up to 5 of your most-visited websites for instant, one-click navigation.
+- **Smart History Tracking**: Keeps a running list of your recently viewed sidebar pages, allowing you to jump back to previous content without re-entering URLs.
+- **Integrated Extension Suite**: Access the comprehensive settings dashboard directly from the sidebar to manage your homepage, quick access pins, and history limits on the fly.
 
 ## 🛠 Installation
 

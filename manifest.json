@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Tab-in-Side",
   "version": "1.1",
-  "description": "Open any website or link in a mobile-view sidebar in Firefox.",
+  "description": "Unlock seamless multitasking by opening any website, link, or bookmark in a mobile-view sidebar. Features advanced header bypassing (X-Frame-Options/CSP) for compatibility with sites like YouTube, GitHub, and more.",
   "author": "Antigravity UI",
   "homepage_url": "https://github.com/PhuongPN6689/tab-in-side",
   "icons": {
