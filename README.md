@@ -6,7 +6,7 @@
 **Tab in Side** is a powerful Firefox extension designed to make multitasking seamless. It allows you to open any website, link, or bookmark directly within your browser's sidebar, complete with a mobile-spoofed interface for better fit and accessibility.
 
 <p align="center">
-  <img alt="Tab in Side Logo" src="icons/icon.svg" width="256">
+  <img alt="Tab in Side Logo" src="src/icons/icon.svg" width="256">
   <br>
   <span style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #3b82f6, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Tab in Side</span>
 </p>
