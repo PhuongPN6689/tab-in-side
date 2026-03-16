@@ -1,9 +1,8 @@
 module.exports = {
+  sourceDir: 'src',
   ignoreFiles: [
     'assets',
-    'assect',
     '*.zip',
-    'web-ext-artifacts',
     '.DS_Store',
     '**/.DS_Store',
     '.git',
