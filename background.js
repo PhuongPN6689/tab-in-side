@@ -1,4 +1,4 @@
-// Tab-in-Side background script
+// Tab in Side background script
 
 const EXTENSION_ORIGIN = browser.runtime.getURL('').slice(0, -1);
 
@@ -84,7 +84,7 @@ browser.runtime.onInstalled.addListener(async () => {
   browser.menus.removeAll();
   browser.menus.create({
     id: "open-in-sidebar",
-    title: "Open in Tab-in-Side",
+    title: "Open in Tab in Side",
     contexts: ["page", "link", "bookmark"]
   });
 

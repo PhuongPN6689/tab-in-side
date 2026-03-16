@@ -1,4 +1,4 @@
-// Tab-in-Side Options Logic
+// Tab in Side Options Logic
 
 const DEFAULT_SETTINGS = {
   default_url: 'https://www.google.com',
