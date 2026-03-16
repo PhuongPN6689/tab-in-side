@@ -177,9 +177,25 @@ async function initSidebar() {
   }
 }
 
-// 1. Listen for clicks on settings button
+// 1. Listen for clicks on toolbar buttons
 settingsBtn.onclick = () => {
   browser.runtime.openOptionsPage();
+};
+
+const reloadBtn = document.getElementById('reload-btn');
+reloadBtn.onclick = () => {
+  // Simplest and most reliable way to reload a cross-origin iframe
+  if (iframe.src) {
+    iframe.src = iframe.src;
+  }
+};
+
+const openTabBtn = document.getElementById('open-tab-btn');
+openTabBtn.onclick = () => {
+  const url = iframe.src;
+  if (url && url !== 'about:blank') {
+    browser.tabs.create({ url });
+  }
 };
 
 // 2. Listen for messages from background script
