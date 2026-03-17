@@ -178,10 +178,18 @@
 
             <div class="form-group setting-row">
                 <div>
-                    <label>Recent History Limit</label>
-                    <div class="help-text">Maximum number of recent "Open in Sidebar" URLs to show.</div>
+                    <label>Toolbar History Buttons</label>
+                    <div class="help-text">Max history buttons to show directly on the toolbar (Max: 10).</div>
                 </div>
-                <input type="number" id="history-limit" min="1" max="10" value="3" class="number-input">
+                <input type="number" id="history-toolbar-limit" min="1" max="10" value="3" class="number-input">
+            </div>
+
+            <div class="form-group setting-row">
+                <div>
+                    <label>Total History Storage</label>
+                    <div class="help-text">Max history records to keep in dropdown (Max: 100).</div>
+                </div>
+                <input type="number" id="history-storage-limit" min="1" max="100" value="30" class="number-input">
             </div>
         </div>
 

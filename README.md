@@ -18,13 +18,13 @@
 | **Seamless Sidebar Integration**: Enhance your productivity with side-by-side browsing. Open any webpage or perform quick searches directly within the sidebar. This allows you to cross-reference data, look up definitions, or watch tutorials while staying focused on your primary workspace. | ![Seamless Sidebar Integration](assets/screenshot_1.jpg) |
 | **Instant Context Menu Access**: Transform your right-click into a powerful navigation tool. Simply right-click anywhere on a webpage or on a specific link to instantly beam that content to the sidebar. It eliminates the hassle of tab-switching and keeps your workflow fluid and uninterrupted. | ![Instant Context Menu Access](assets/screenshot_2.jpg) |
 | **Direct Bookmark Launch**: Your favorites are now just a click away. We’ve integrated Tab-in-Side directly into your Firefox Bookmarks. Right-click any saved bookmark to open it immediately in the side panel, making your most-used resources available without cluttering your tab bar. | ![Direct Bookmark Launch](assets/screenshot_3.jpg) |
-| **Quick Access & History Management**: Personalize your dashboard for maximum efficiency. Use the settings page to configure up to 5 high-priority quick-access links. You can also manage your browsing trail by adjusting the history limit, ensuring your most recently visited pages are always ready for a quick revisit. | ![Quick Access & History Management](assets/screenshot_4.jpg) |
+| **Quick Access & History Management**: Personalize your dashboard for maximum efficiency. Use the settings page to configure up to 10 high-priority quick-access links. You can also manage your browsing trail by adjusting the history limit, ensuring your most recently visited pages are always ready for a quick revisit. | ![Quick Access & History Management](assets/screenshot_4.jpg) |
 | **Transparent & Open Source**: Built with trust and community in mind. Tab-in-Side is fully open-source. You can explore, audit, or contribute to the entire codebase on GitHub. We believe in transparency and welcome developers to help us make the extension even better. | ![Transparent & Open Source](assets/screenshot_5.jpg) |
 
 ## ✨ Core Capabilities
 
 - **Seamless Context Menu Integration**: Effortlessly open any hyperlink, current webpage, or saved bookmark directly into your browser's sidebar with a single right-click. No more switching tabs for quick lookups.
-- **Customizable Quick Access**: Features a dynamic toolbar where you can pin up to 5 of your most-visited websites for instant, one-click navigation.
+- **Customizable Quick Access**: Features a dynamic toolbar where you can pin up to 10 of your most-visited websites for instant, one-click navigation.
 - **Smart History Tracking**: Keeps a running list of your recently viewed sidebar pages, allowing you to jump back to previous content without re-entering URLs.
 - **Integrated Extension Suite**: Access the comprehensive settings dashboard directly from the sidebar to manage your homepage, quick access pins, and history limits on the fly.
 

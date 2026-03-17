@@ -117,9 +117,9 @@ browser.menus.onClicked.addListener(async (info, tab) => {
     
     if (urlToLoad) {
       // Update History
-      const data = await browser.storage.local.get(['history', 'history_limit']);
+      const data = await browser.storage.local.get(['history', 'history_storage_limit']);
       let history = data.history || [];
-      const limit = data.history_limit || 3;
+      const limit = data.history_storage_limit || 30;
 
       // Remove if exists to re-insert at front
       history = history.filter(item => item !== urlToLoad);

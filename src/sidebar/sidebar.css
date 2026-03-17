@@ -92,3 +92,58 @@ body, html {
     height: 100%;
     background: #fff;
 }
+
+/* Dropdown Styles */
+.dropdown-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid var(--toolbar-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 180px;
+    max-width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    padding: 4px 0;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 13px;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background: var(--btn-hover);
+}
+
+.dropdown-item .icon-img {
+    flex-shrink: 0;
+}
+
+.dropdown-item .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}

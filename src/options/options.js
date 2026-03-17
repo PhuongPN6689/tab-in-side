@@ -8,7 +8,8 @@ const DEFAULT_SETTINGS = {
     { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
   ],
   mobile_view: true,
-  history_limit: 3,
+  history_toolbar_limit: 3,
+  history_storage_limit: 30,
   zoom_level: 90
 };
 
@@ -17,16 +18,17 @@ const saveBtn = document.getElementById('save-btn');
 const addBtn = document.getElementById('add-btn');
 const statusMsg = document.getElementById('status');
 const defaultUrlInput = document.getElementById('default-url');
-const historyLimitInput = document.getElementById('history-limit');
+const historyToolbarLimitInput = document.getElementById('history-toolbar-limit');
+const historyStorageLimitInput = document.getElementById('history-storage-limit');
 const zoomLevelInput = document.getElementById('zoom-level');
 
-const MAX_BUTTONS = 5;
+const MAX_BUTTONS = 10;
 
 /**
  * Initialize options UI
  */
 async function loadOptions() {
-  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_limit', 'zoom_level']);
+  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level']);
 
   // Set default URL
   defaultUrlInput.value = data.default_url || DEFAULT_SETTINGS.default_url;
@@ -34,8 +36,9 @@ async function loadOptions() {
   // Set mobile view toggle
   document.getElementById('mobile-view-toggle').checked = (data.mobile_view !== undefined) ? data.mobile_view : DEFAULT_SETTINGS.mobile_view;
 
-  // Set history limit
-  historyLimitInput.value = data.history_limit || DEFAULT_SETTINGS.history_limit;
+  // Set history limits
+  historyToolbarLimitInput.value = data.history_toolbar_limit || DEFAULT_SETTINGS.history_toolbar_limit;
+  historyStorageLimitInput.value = data.history_storage_limit || DEFAULT_SETTINGS.history_storage_limit;
 
   // Set zoom level
   zoomLevelInput.value = data.zoom_level || DEFAULT_SETTINGS.zoom_level;
@@ -117,7 +120,8 @@ addBtn.addEventListener('click', () => {
 async function saveOptions() {
   const default_url = defaultUrlInput.value.trim();
   const mobile_view = document.getElementById('mobile-view-toggle').checked;
-  const history_limit = parseInt(historyLimitInput.value) || DEFAULT_SETTINGS.history_limit;
+  const history_toolbar_limit = parseInt(historyToolbarLimitInput.value) || DEFAULT_SETTINGS.history_toolbar_limit;
+  const history_storage_limit = parseInt(historyStorageLimitInput.value) || DEFAULT_SETTINGS.history_storage_limit;
   const zoom_level = parseInt(zoomLevelInput.value) || DEFAULT_SETTINGS.zoom_level;
   const rows = container.querySelectorAll('.quick-access-row:not(.header-row)');
 
@@ -141,7 +145,8 @@ async function saveOptions() {
   await browser.storage.local.set({
     default_url,
     mobile_view,
-    history_limit,
+    history_toolbar_limit,
+    history_storage_limit,
     zoom_level,
     quick_urls
   });

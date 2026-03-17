@@ -119,10 +119,17 @@ function createToolbarButton(title, url, isHistory = false, zoom = null, mobile 
   return btn;
 }
 
+const historyDropdownContainer = document.getElementById('history-dropdown-container');
+const historyDropdownBtn = document.getElementById('history-dropdown-btn');
+const historyDropdownMenu = document.getElementById('history-dropdown-menu');
+
 /**
  * Update button tooltips/titles and favicons from settings
  */
-function updateButtonUI() {
+async function updateButtonUI() {
+  const data = await browser.storage.local.get('history_toolbar_limit');
+  const toolbarLimit = data.history_toolbar_limit || 3;
+
   // 1. Render Quick Access
   quickBtnsContainer.innerHTML = '';
   quickUrls.forEach((item) => {
@@ -132,16 +139,75 @@ function updateButtonUI() {
     }
   });
 
-  // 2. Render History
+  // 2. Render History with Overflow Detection
   historyBtnsContainer.innerHTML = '';
+  historyDropdownMenu.innerHTML = '';
+  
   if (historyUrls.length > 0) {
     historyDivider.style.display = 'block';
-    historyUrls.forEach((url) => {
+    
+    // We'll calculate how many buttons can fit
+    const toolbar = document.getElementById('toolbar');
+    const toolbarWidth = toolbar.clientWidth;
+    const quickWidth = quickBtnsContainer.offsetWidth || 100; // Fallback
+    const navBtnsWidth = 110; // Reload + Open Tab + Settings + Margins
+    const dividerWidth = 10; 
+    
+    // Available width for history buttons (always reserving space for the dropdown button)
+    let availableWidth = toolbarWidth - quickWidth - navBtnsWidth - dividerWidth - 34; // -34 for dropdown btn
+    
+    let buttonsThatFit;
+    if (toolbarWidth === 0) {
+      buttonsThatFit = toolbarLimit;
+    } else {
+      // Buttons that fit based on width, but also capped by toolbarLimit
+      const widthFit = Math.max(0, Math.floor(availableWidth / 34));
+      buttonsThatFit = Math.min(widthFit, toolbarLimit);
+    }
+
+    // Toolbar shows only the most recent N items that fit
+    const toolbarHistory = historyUrls.slice(0, buttonsThatFit);
+    
+    // Dropdown shows EVERYTHING
+    const dropdownHistory = historyUrls;
+
+    toolbarHistory.forEach((url) => {
       const btn = createToolbarButton(url, url, true);
       historyBtnsContainer.appendChild(btn);
     });
+
+    if (dropdownHistory.length > 0) {
+      historyDropdownContainer.style.display = 'flex';
+      dropdownHistory.forEach((url) => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.title = url;
+        
+        const img = document.createElement('img');
+        img.className = 'icon-img';
+        img.src = getFaviconUrl(url);
+        img.alt = '';
+        
+        const title = document.createElement('span');
+        title.className = 'title';
+        title.textContent = url;
+        
+        item.appendChild(img);
+        item.appendChild(title);
+        
+        item.onclick = () => {
+          updateIframe(url);
+          historyDropdownMenu.classList.remove('show');
+        };
+        
+        historyDropdownMenu.appendChild(item);
+      });
+    } else {
+      historyDropdownContainer.style.display = 'none';
+    }
   } else {
     historyDivider.style.display = 'none';
+    historyDropdownContainer.style.display = 'none';
   }
 }
 
@@ -166,7 +232,7 @@ async function initSidebar() {
   }
 
   historyUrls = data.history || [];
-  updateButtonUI();
+  await updateButtonUI();
   
   const targetUrl = data.last_requested_url || data.default_url || (quickUrls[0]?.url);
   if (targetUrl) updateIframe(targetUrl);
@@ -198,6 +264,24 @@ openTabBtn.onclick = () => {
   }
 };
 
+// Dropdown Toggle
+historyDropdownBtn.onclick = (e) => {
+  e.stopPropagation();
+  historyDropdownMenu.classList.toggle('show');
+};
+
+// Close dropdown when clicking outside
+window.onclick = () => {
+  if (historyDropdownMenu.classList.contains('show')) {
+    historyDropdownMenu.classList.remove('show');
+  }
+};
+
+// Handle window resize to recalculate overflow
+window.onresize = () => {
+  updateButtonUI();
+};
+
 // 2. Listen for messages from background script
 browser.runtime.onMessage.addListener((message) => {
   if (message.type === 'LOAD_URL') {
@@ -217,6 +301,9 @@ browser.storage.onChanged.addListener((changes, area) => {
     }
     if (changes.history) {
       historyUrls = changes.history.newValue;
+      updateButtonUI();
+    }
+    if (changes.history_toolbar_limit) {
       updateButtonUI();
     }
     if (changes.mobile_view) {
