@@ -58,25 +58,6 @@ async function updateNetRules() {
   });
 }
 
-// Intercept headers using webRequest API to bypass frame restrictions robustly
-// No longer need manual webRequest onHeadersReceived in background.js 
-// as declarativeNetRequest handles it more efficiently.
-/*
-browser.webRequest.onHeadersReceived.addListener(
-  (details) => {
-    if (details.type === 'sub_frame') {
-      const responseHeaders = details.responseHeaders.filter(header => {
-        const name = header.name.toLowerCase();
-        return name !== 'x-frame-options' && name !== 'frame-options' && name !== 'content-security-policy';
-      });
-      return { responseHeaders };
-    }
-  },
-  { urls: ["<all_urls>"] },
-  ["blocking", "responseHeaders"]
-);
-*/
-
 
 // Create context menu items on installation
 browser.runtime.onInstalled.addListener(async () => {

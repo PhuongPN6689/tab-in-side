@@ -43,7 +43,7 @@ npx web-ext build --config web-ext-config.cjs
 ```
 
 ### For Users (Once Published)
-Install directly from the [Firefox Add-on Store](https://addons.mozilla.org/).
+Install directly from the [Firefox Add-on Store](https://addons.mozilla.org/vi/firefox/addon/tab-in-side/).
 
 ## 📖 Usage Guide
 

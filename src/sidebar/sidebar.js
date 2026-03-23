@@ -61,44 +61,6 @@ let zoomLevel = 90;
 
 const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
 
-// Header modifications are now centrally managed in background.js via declarativeNetRequest
-// for better reliability and performance in MV3.
-/*
-browser.webRequest.onBeforeSendHeaders.addListener(
-  (details) => {
-    // Target only iframe requests inside our sidebar context (tabId: -1)
-    if (details.tabId === -1 && details.type === 'sub_frame') {
-      if (mobileViewEnabled) {
-        for (let header of details.requestHeaders) {
-          if (header.name.toLowerCase() === 'user-agent') {
-            header.value = MOBILE_USER_AGENT;
-            break;
-          }
-        }
-      }
-      return { requestHeaders: details.requestHeaders };
-    }
-  },
-  { urls: ["<all_urls>"] },
-  ["blocking", "requestHeaders"]
-);
-
-browser.webRequest.onHeadersReceived.addListener(
-  (details) => {
-    // Target only iframe requests inside our sidebar context (tabId: -1)
-    if (details.tabId === -1 && details.type === 'sub_frame') {
-      const responseHeaders = details.responseHeaders.filter(header => {
-        const name = header.name.toLowerCase();
-        return name !== 'x-frame-options' && name !== 'frame-options' && name !== 'content-security-policy';
-      });
-      return { responseHeaders };
-    }
-  },
-  { urls: ["<all_urls>"] },
-  ["blocking", "responseHeaders"]
-);
-*/
-
 /**
  * Update the iframe source
  * @param {string} url 
@@ -286,7 +248,7 @@ async function initSidebar() {
     // Fallback if not set yet
     quickUrls = [
       { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
-      { name: 'Translate', url: 'https://translate.google.com', zoom: 90, mobile: true },
+      { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true },
       { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
     ];
   }
