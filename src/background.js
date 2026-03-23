@@ -84,7 +84,7 @@ browser.runtime.onInstalled.addListener(async () => {
   browser.menus.removeAll();
   browser.menus.create({
     id: "open-in-sidebar",
-    title: "Open in Tab in Side",
+    title: "Open in 'Tab in Side'",
     contexts: ["page", "link", "bookmark"]
   });
 
@@ -96,6 +96,19 @@ browser.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && (changes.mobile_view)) {
     updateNetRules();
   }
+});
+
+// Dynamically update menu title based on context
+browser.menus.onShown.addListener((info, tab) => {
+  let title = "Open page in 'Tab in Side'";
+  if (info.bookmarkId) {
+    title = "Open bookmark in 'Tab in Side'";
+  } else if (info.linkUrl) {
+    title = "Open link in 'Tab in Side'";
+  }
+  
+  browser.menus.update("open-in-sidebar", { title });
+  browser.menus.refresh();
 });
 
 // Listener for context menu clicks

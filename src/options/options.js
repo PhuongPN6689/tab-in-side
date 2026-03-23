@@ -4,7 +4,7 @@ const DEFAULT_SETTINGS = {
   default_url: 'https://www.google.com',
   quick_urls: [
     { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
-    { name: 'Translate', url: 'https://translate.google.com', zoom: 90, mobile: true },
+    { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true },
     { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
   ],
   mobile_view: true,
@@ -21,6 +21,7 @@ const defaultUrlInput = document.getElementById('default-url');
 const historyToolbarLimitInput = document.getElementById('history-toolbar-limit');
 const historyStorageLimitInput = document.getElementById('history-storage-limit');
 const zoomLevelInput = document.getElementById('zoom-level');
+const resetBtn = document.getElementById('reset-btn');
 
 const MAX_BUTTONS = 10;
 
@@ -158,5 +159,30 @@ async function saveOptions() {
   }, 2000);
 }
 
+/**
+ * Reset options to defaults
+ */
+async function resetOptions() {
+  if (confirm('Are you sure you want to reset all settings to their default values?')) {
+    await browser.storage.local.clear();
+    
+    // Clear existing quick access rows
+    const rows = container.querySelectorAll('.quick-access-row:not(.header-row)');
+    rows.forEach(row => row.remove());
+
+    // Reload options
+    await loadOptions();
+
+    // Show success message
+    statusMsg.textContent = 'Settings reset to defaults!';
+    statusMsg.style.display = 'block';
+    setTimeout(() => {
+      statusMsg.style.display = 'none';
+      statusMsg.textContent = 'Settings saved successfully!';
+    }, 2000);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', loadOptions);
 saveBtn.addEventListener('click', saveOptions);
+resetBtn.addEventListener('click', resetOptions);
