@@ -1,0 +1,37 @@
+name: Deploy Extension to Firefox Add-ons (AMO)
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers on tags like v1.0.0, v1.2.0, etc.
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Extension
+        run: npm run build
+
+      - name: Sign and Deploy to AMO
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npm run sign -- \
+            --api-key=$AMO_JWT_ISSUER \
+            --api-secret=$AMO_JWT_SECRET \
+            --channel=listed \
+            --source-dir=src \
+            --artifacts-dir=web-ext-artifacts

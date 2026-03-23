@@ -3,6 +3,55 @@ const quickBtnsContainer = document.getElementById('quick-btns-container');
 const historyBtnsContainer = document.getElementById('history-btns-container');
 const historyDivider = document.getElementById('history-divider');
 const settingsBtn = document.getElementById('settings-btn');
+const tooltipContainer = document.getElementById('custom-tooltip');
+const tooltipTitle = tooltipContainer.querySelector('.tooltip-title');
+const tooltipUrl = tooltipContainer.querySelector('.tooltip-url');
+
+// Tooltip Management
+function showTooltip(e, title, url) {
+  if (!title && !url) return;
+  
+  tooltipTitle.textContent = title || '';
+  tooltipTitle.style.display = title ? 'block' : 'none';
+  
+  tooltipUrl.textContent = url || '';
+  tooltipUrl.style.display = url ? 'block' : 'none';
+  
+  tooltipContainer.style.display = 'block';
+  
+  const rect = e.currentTarget.getBoundingClientRect();
+  const tooltipRect = tooltipContainer.getBoundingClientRect();
+  
+  // Position below the button
+  let top = rect.bottom + 8;
+  let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+  
+  // Keep within viewport
+  if (left < 4) left = 4;
+  if (left + tooltipRect.width > window.innerWidth - 4) {
+    left = window.innerWidth - tooltipRect.width - 4;
+  }
+  
+  // If no space below, show above
+  if (top + tooltipRect.height > window.innerHeight - 4) {
+    top = rect.top - tooltipRect.height - 8;
+  }
+  
+  tooltipContainer.style.top = `${top}px`;
+  tooltipContainer.style.left = `${left}px`;
+}
+
+function hideTooltip() {
+  tooltipContainer.style.display = 'none';
+}
+
+function attachTooltip(element, title, url) {
+  // Remove native title to prevent double tooltip
+  element.removeAttribute('title');
+  
+  element.onmouseenter = (e) => showTooltip(e, title, url);
+  element.onmouseleave = hideTooltip;
+}
 
 // State
 let quickUrls = [];
@@ -108,6 +157,8 @@ function createToolbarButton(title, url, isHistory = false, zoom = null, mobile 
   img.alt = '';
   
   btn.appendChild(img);
+  attachTooltip(btn, title, url);
+  
   btn.onclick = async () => {
     // If specific view mode is set, update global mobile_view toggle
     // This will trigger background.js updateNetRules via storage listener
@@ -135,6 +186,8 @@ async function updateButtonUI() {
   quickUrls.forEach((item) => {
     if (item.url) {
       const btn = createToolbarButton(item.name || 'Quick Access', item.url, false, item.zoom, item.mobile);
+      // Re-attach tooltip with URL for Quick Access
+      attachTooltip(btn, item.name || 'Quick Access', item.url);
       quickBtnsContainer.appendChild(btn);
     }
   });
@@ -150,7 +203,7 @@ async function updateButtonUI() {
     const toolbar = document.getElementById('toolbar');
     const toolbarWidth = toolbar.clientWidth;
     const quickWidth = quickBtnsContainer.offsetWidth || 100; // Fallback
-    const navBtnsWidth = 110; // Reload + Open Tab + Settings + Margins
+    const navBtnsWidth = 144; // Reload + Copy Link + Open Tab + Settings + Margins
     const dividerWidth = 10; 
     
     // Available width for history buttons (always reserving space for the dropdown button)
@@ -171,36 +224,43 @@ async function updateButtonUI() {
     // Dropdown shows EVERYTHING
     const dropdownHistory = historyUrls;
 
-    toolbarHistory.forEach((url) => {
-      const btn = createToolbarButton(url, url, true);
+    toolbarHistory.forEach((item) => {
+      const hTitle = (typeof item === 'string') ? item : item.title;
+      const hUrl = (typeof item === 'string') ? item : item.url;
+      
+      const btn = createToolbarButton(hTitle, hUrl, true);
+      attachTooltip(btn, hTitle, hUrl);
       historyBtnsContainer.appendChild(btn);
     });
 
     if (dropdownHistory.length > 0) {
       historyDropdownContainer.style.display = 'flex';
-      dropdownHistory.forEach((url) => {
-        const item = document.createElement('div');
-        item.className = 'dropdown-item';
-        item.title = url;
+      dropdownHistory.forEach((item) => {
+        const hTitle = (typeof item === 'string') ? item : item.title;
+        const hUrl = (typeof item === 'string') ? item : item.url;
+
+        const divItem = document.createElement('div');
+        divItem.className = 'dropdown-item';
+        attachTooltip(divItem, hTitle, hUrl);
         
         const img = document.createElement('img');
         img.className = 'icon-img';
-        img.src = getFaviconUrl(url);
+        img.src = getFaviconUrl(hUrl);
         img.alt = '';
         
-        const title = document.createElement('span');
-        title.className = 'title';
-        title.textContent = url;
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'title';
+        titleSpan.textContent = hTitle;
         
-        item.appendChild(img);
-        item.appendChild(title);
+        divItem.appendChild(img);
+        divItem.appendChild(titleSpan);
         
-        item.onclick = () => {
-          updateIframe(url);
+        divItem.onclick = () => {
+          updateIframe(hUrl);
           historyDropdownMenu.classList.remove('show');
         };
         
-        historyDropdownMenu.appendChild(item);
+        historyDropdownMenu.appendChild(divItem);
       });
     } else {
       historyDropdownContainer.style.display = 'none';
@@ -226,7 +286,7 @@ async function initSidebar() {
     // Fallback if not set yet
     quickUrls = [
       { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
-      { name: 'GG Dịch', url: 'https://translate.google.com', zoom: 90, mobile: true },
+      { name: 'Translate', url: 'https://translate.google.com', zoom: 90, mobile: true },
       { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
     ];
   }
@@ -247,6 +307,7 @@ async function initSidebar() {
 settingsBtn.onclick = () => {
   browser.runtime.openOptionsPage();
 };
+attachTooltip(settingsBtn, 'Settings', 'Extension Options');
 
 const reloadBtn = document.getElementById('reload-btn');
 reloadBtn.onclick = () => {
@@ -255,6 +316,31 @@ reloadBtn.onclick = () => {
     iframe.src = iframe.src;
   }
 };
+attachTooltip(reloadBtn, 'Reload', 'Refresh current page');
+
+const copyLinkBtn = document.getElementById('copy-link-btn');
+copyLinkBtn.onclick = async () => {
+  const url = iframe.src;
+  if (url && url !== 'about:blank') {
+    try {
+      await navigator.clipboard.writeText(url);
+      
+      // Visual feedback
+      const originalTitle = copyLinkBtn.title;
+      // Temporarily change tooltip via data/manager instead of attribute
+      showTooltip({ currentTarget: copyLinkBtn }, 'Link Copied!', url);
+      copyLinkBtn.style.color = '#1e8e3e'; // Success green
+      
+      setTimeout(() => {
+        hideTooltip();
+        copyLinkBtn.style.color = '';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
+};
+attachTooltip(copyLinkBtn, 'Copy Link', 'Copy current page URL');
 
 const openTabBtn = document.getElementById('open-tab-btn');
 openTabBtn.onclick = () => {
@@ -263,12 +349,14 @@ openTabBtn.onclick = () => {
     browser.tabs.create({ url });
   }
 };
+attachTooltip(openTabBtn, 'Open in New Tab', 'Open current page in a full browser tab');
 
 // Dropdown Toggle
 historyDropdownBtn.onclick = (e) => {
   e.stopPropagation();
   historyDropdownMenu.classList.toggle('show');
 };
+attachTooltip(historyDropdownBtn, 'More History', 'Show all browsing history');
 
 // Close dropdown when clicking outside
 window.onclick = () => {

@@ -129,14 +129,29 @@ browser.menus.onClicked.addListener(async (info, tab) => {
     }
     
     if (urlToLoad) {
+      // Determine title
+      let titleToSave = info.linkText || tab.title || urlToLoad;
+      if (info.bookmarkId) {
+        try {
+          const bookmarks = await browser.bookmarks.get(info.bookmarkId);
+          if (bookmarks[0] && bookmarks[0].title) {
+            titleToSave = bookmarks[0].title;
+          }
+        } catch (e) {}
+      }
+
       // Update History
       const data = await browser.storage.local.get(['history', 'history_storage_limit']);
       let history = data.history || [];
       const limit = data.history_storage_limit || 30;
 
-      // Remove if exists to re-insert at front
-      history = history.filter(item => item !== urlToLoad);
-      history.unshift(urlToLoad);
+      // Remove if exists to re-insert at front (checking by URL)
+      history = history.filter(item => {
+        const itemUrl = (typeof item === 'string') ? item : item.url;
+        return itemUrl !== urlToLoad;
+      });
+      
+      history.unshift({ title: titleToSave, url: urlToLoad });
       history = history.slice(0, limit);
 
       await browser.storage.local.set({ 
