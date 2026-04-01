@@ -22,19 +22,32 @@ function showTooltip(e, title, url) {
   const rect = e.currentTarget.getBoundingClientRect();
   const tooltipRect = tooltipContainer.getBoundingClientRect();
   
-  // Position below the button
-  let top = rect.bottom + 8;
-  let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+  let top, left;
   
-  // Keep within viewport
+  if (toolbarPosition === 'left') {
+    // Position to the right of the button
+    top = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
+    left = rect.right + 8;
+  } else if (toolbarPosition === 'right') {
+    // Position to the left of the button
+    top = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
+    left = rect.left - tooltipRect.width - 8;
+  } else {
+    // Position below the button (top position)
+    top = rect.bottom + 8;
+    left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+  }
+  
+  // Keep within viewport (horizontal)
   if (left < 4) left = 4;
   if (left + tooltipRect.width > window.innerWidth - 4) {
     left = window.innerWidth - tooltipRect.width - 4;
   }
   
-  // If no space below, show above
+  // Keep within viewport (vertical)
+  if (top < 4) top = 4;
   if (top + tooltipRect.height > window.innerHeight - 4) {
-    top = rect.top - tooltipRect.height - 8;
+    top = window.innerHeight - tooltipRect.height - 4;
   }
   
   tooltipContainer.style.top = `${top}px`;
@@ -58,6 +71,7 @@ let quickUrls = [];
 let historyUrls = [];
 let mobileViewEnabled = true;
 let zoomLevel = 90;
+let toolbarPosition = 'top';
 
 const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
 
@@ -163,21 +177,23 @@ async function updateButtonUI() {
     
     // We'll calculate how many buttons can fit
     const toolbar = document.getElementById('toolbar');
-    const toolbarWidth = toolbar.clientWidth;
-    const quickWidth = quickBtnsContainer.offsetWidth || 100; // Fallback
-    const navBtnsWidth = 144; // Reload + Copy Link + Open Tab + Settings + Margins
-    const dividerWidth = 10; 
+    const isVertical = (toolbarPosition === 'left' || toolbarPosition === 'right');
+    const toolbarSize = isVertical ? toolbar.clientHeight : toolbar.clientWidth;
+    const quickSize = isVertical ? (quickBtnsContainer.offsetHeight || 100) : (quickBtnsContainer.offsetWidth || 100);
+    const actionsContainer = document.getElementById('actions-container');
+    const navBtnsSize = isVertical ? (actionsContainer?.offsetHeight || 144) : (actionsContainer?.offsetWidth || 144);
+    const dividerSize = 10; 
     
-    // Available width for history buttons (always reserving space for the dropdown button)
-    let availableWidth = toolbarWidth - quickWidth - navBtnsWidth - dividerWidth - 34; // -34 for dropdown btn
+    // Available size for history buttons (always reserving space for the dropdown button)
+    let availableSize = toolbarSize - quickSize - navBtnsSize - dividerSize - 34; // -34 for dropdown btn
     
     let buttonsThatFit;
-    if (toolbarWidth === 0) {
+    if (toolbarSize === 0) {
       buttonsThatFit = toolbarLimit;
     } else {
-      // Buttons that fit based on width, but also capped by toolbarLimit
-      const widthFit = Math.max(0, Math.floor(availableWidth / 34));
-      buttonsThatFit = Math.min(widthFit, toolbarLimit);
+      // Buttons that fit based on size, but also capped by toolbarLimit
+      const sizeFit = Math.max(0, Math.floor(availableSize / 34));
+      buttonsThatFit = Math.min(sizeFit, toolbarLimit);
     }
 
     // Toolbar shows only the most recent N items that fit
@@ -237,10 +253,16 @@ async function updateButtonUI() {
  * Load initial state from storage
  */
 async function initSidebar() {
-  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level']);
+  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level', 'toolbar_position']);
   
   mobileViewEnabled = data.mobile_view !== false; // Default to true
   zoomLevel = data.zoom_level || 90;
+  toolbarPosition = data.toolbar_position || 'top';
+  
+  // Apply toolbar position
+  const container = document.querySelector('.sidebar-container');
+  container.classList.remove('pos-top', 'pos-left', 'pos-right');
+  container.classList.add(`pos-${toolbarPosition}`);
 
   if (data.quick_urls) {
     quickUrls = data.quick_urls;
@@ -362,6 +384,13 @@ browser.storage.onChanged.addListener((changes, area) => {
     if (changes.zoom_level) {
       zoomLevel = changes.zoom_level.newValue || 90;
       applyZoom(zoomLevel);
+    }
+    if (changes.toolbar_position) {
+      toolbarPosition = changes.toolbar_position.newValue || 'top';
+      const container = document.querySelector('.sidebar-container');
+      container.classList.remove('pos-top', 'pos-left', 'pos-right');
+      container.classList.add(`pos-${toolbarPosition}`);
+      updateButtonUI();
     }
   }
 });

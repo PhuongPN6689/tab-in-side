@@ -10,7 +10,8 @@ const DEFAULT_SETTINGS = {
   mobile_view: true,
   history_toolbar_limit: 3,
   history_storage_limit: 30,
-  zoom_level: 90
+  zoom_level: 90,
+  toolbar_position: 'top'
 };
 
 const container = document.getElementById('quick-urls-container');
@@ -21,6 +22,7 @@ const defaultUrlInput = document.getElementById('default-url');
 const historyToolbarLimitInput = document.getElementById('history-toolbar-limit');
 const historyStorageLimitInput = document.getElementById('history-storage-limit');
 const zoomLevelInput = document.getElementById('zoom-level');
+const toolbarPositionInput = document.getElementById('toolbar-position');
 const resetBtn = document.getElementById('reset-btn');
 
 const MAX_BUTTONS = 10;
@@ -29,7 +31,7 @@ const MAX_BUTTONS = 10;
  * Initialize options UI
  */
 async function loadOptions() {
-  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level']);
+  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level', 'toolbar_position']);
 
   // Set default URL
   defaultUrlInput.value = data.default_url || DEFAULT_SETTINGS.default_url;
@@ -43,6 +45,9 @@ async function loadOptions() {
 
   // Set zoom level
   zoomLevelInput.value = data.zoom_level || DEFAULT_SETTINGS.zoom_level;
+
+  // Set toolbar position
+  toolbarPositionInput.value = data.toolbar_position || DEFAULT_SETTINGS.toolbar_position;
 
   // Set quick URLs
   const quickUrls = data.quick_urls || DEFAULT_SETTINGS.quick_urls;
@@ -124,6 +129,7 @@ async function saveOptions() {
   const history_toolbar_limit = parseInt(historyToolbarLimitInput.value) || DEFAULT_SETTINGS.history_toolbar_limit;
   const history_storage_limit = parseInt(historyStorageLimitInput.value) || DEFAULT_SETTINGS.history_storage_limit;
   const zoom_level = parseInt(zoomLevelInput.value) || DEFAULT_SETTINGS.zoom_level;
+  const toolbar_position = toolbarPositionInput.value || DEFAULT_SETTINGS.toolbar_position;
   const rows = container.querySelectorAll('.quick-access-row:not(.header-row)');
 
   const quick_urls = [];
@@ -149,6 +155,7 @@ async function saveOptions() {
     history_toolbar_limit,
     history_storage_limit,
     zoom_level,
+    toolbar_position,
     quick_urls
   });
 
