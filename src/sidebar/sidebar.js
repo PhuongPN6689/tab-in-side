@@ -121,7 +121,7 @@ function getFaviconUrl(url) {
 /**
  * Helper to create a toolbar button
  */
-function createToolbarButton(title, url, isHistory = false, zoom = null, mobile = null) {
+function createToolbarButton(title, url, isHistory = false, zoom = null, mobile = null, customIcon = null) {
   const btn = document.createElement('button');
   btn.className = 'nav-btn';
   if (isHistory) btn.style.opacity = '0.8';
@@ -129,7 +129,7 @@ function createToolbarButton(title, url, isHistory = false, zoom = null, mobile 
   
   const img = document.createElement('img');
   img.className = 'icon-img';
-  img.src = getFaviconUrl(url);
+  img.src = customIcon || getFaviconUrl(url);
   img.alt = '';
   
   btn.appendChild(img);
@@ -161,7 +161,7 @@ async function updateButtonUI() {
   quickBtnsContainer.innerHTML = '';
   quickUrls.forEach((item) => {
     if (item.url) {
-      const btn = createToolbarButton(item.name || 'Quick Access', item.url, false, item.zoom, item.mobile);
+      const btn = createToolbarButton(item.name || 'Quick Access', item.url, false, item.zoom, item.mobile, item.icon);
       // Re-attach tooltip with URL for Quick Access
       attachTooltip(btn, item.name || 'Quick Access', item.url);
       quickBtnsContainer.appendChild(btn);

@@ -3,9 +3,9 @@
 const DEFAULT_SETTINGS = {
   default_url: 'https://www.google.com',
   quick_urls: [
-    { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
-    { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true },
-    { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
+    { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true, icon: '' },
+    { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true, icon: '' },
+    { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true, icon: '' }
   ],
   mobile_view: true,
   history_toolbar_limit: 3,
@@ -49,17 +49,21 @@ async function loadOptions() {
   // Set toolbar position
   toolbarPositionInput.value = data.toolbar_position || DEFAULT_SETTINGS.toolbar_position;
 
+  // Clear existing quick URLs
+  const existingRows = container.querySelectorAll('.quick-access-row:not(.header-row)');
+  existingRows.forEach(row => row.remove());
+
   // Set quick URLs
   const quickUrls = data.quick_urls || DEFAULT_SETTINGS.quick_urls;
 
   quickUrls.forEach((item) => {
-    createRow(item.name, item.url);
+    createRow(item.name, item.url, item.zoom, (item.mobile !== undefined ? item.mobile : true), item.icon);
   });
 
   updateAddButtonState();
 }
 
-function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = true) {
+function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = true, iconValue = '') {
   const row = document.createElement('div');
   row.className = 'quick-access-row';
 
@@ -75,6 +79,12 @@ function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = 
   urlInput.value = urlValue;
   urlInput.placeholder = 'https://...';
 
+  const iconInput = document.createElement('input');
+  iconInput.type = 'text';
+  iconInput.className = 'quick-icon';
+  iconInput.value = iconValue || '';
+  iconInput.placeholder = 'Icon URL (Optional)';
+
   const zoomInput = document.createElement('input');
   zoomInput.type = 'number';
   zoomInput.className = 'quick-zoom number-input';
@@ -86,7 +96,7 @@ function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = 
   const mobileInput = document.createElement('input');
   mobileInput.type = 'checkbox';
   mobileInput.className = 'quick-mobile checkbox-input';
-  mobileInput.checked = mobileValue !== false;
+  mobileInput.checked = (mobileValue === true);
   mobileInput.style.margin = 'auto';
 
   const deleteBtn = document.createElement('button');
@@ -100,6 +110,7 @@ function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = 
 
   row.appendChild(nameInput);
   row.appendChild(urlInput);
+  row.appendChild(iconInput);
   row.appendChild(zoomInput);
   row.appendChild(mobileInput);
   row.appendChild(deleteBtn);
@@ -136,15 +147,17 @@ async function saveOptions() {
   rows.forEach(row => {
     const nameInput = row.querySelector('.quick-name');
     const urlInput = row.querySelector('.quick-url');
+    const iconInput = row.querySelector('.quick-icon');
     const zoomInput = row.querySelector('.quick-zoom');
     const mobileInput = row.querySelector('.quick-mobile');
     if (nameInput && urlInput) {
       const name = nameInput.value.trim();
       const url = urlInput.value.trim();
+      const icon = iconInput.value.trim();
       const zoom = parseInt(zoomInput.value) || 90;
       const mobile = mobileInput.checked;
       if (name || url) {
-        quick_urls.push({ name, url, zoom, mobile });
+        quick_urls.push({ name, url, zoom, mobile, icon });
       }
     }
   });

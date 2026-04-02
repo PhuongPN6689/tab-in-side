@@ -93,13 +93,13 @@
 
         .quick-access-row {
             display: grid;
-            grid-template-columns: 130px 1fr 65px 60px 32px;
+            grid-template-columns: 110px 1fr 1fr 65px 60px 32px;
             gap: 12px;
             margin-bottom: 12px;
             align-items: center;
         }
         .header-row label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .header-row label:nth-child(3) { text-align: center; }
+        .header-row label:nth-child(4), .header-row label:nth-child(5) { text-align: center; }
 
         .actions {
             margin-top: 32px;
@@ -230,6 +230,7 @@
                 <div class="quick-access-row header-row">
                     <label>Display Name</label>
                     <label>Target URL</label>
+                    <label>Icon URL (Optional)</label>
                     <label style="text-align: center;">Zoom (%)</label>
                     <label style="text-align: center;">Mobile</label>
                     <span></span>
