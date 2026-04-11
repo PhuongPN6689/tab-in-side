@@ -9,6 +9,10 @@
 <body>
     <div class="sidebar-container">
         <div class="toolbar" id="toolbar">
+            <button id="add-url-btn" class="nav-btn" title="Add / Search URL">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+            <div class="v-divider"></div>
             <div id="quick-btns-container" style="display: flex; gap: 2px;">
                 <!-- Buttons will be injected by sidebar.js -->
             </div>
@@ -24,6 +28,7 @@
                     <!-- Overflow history items will be injected here -->
                 </div>
             </div>
+            
             <div class="divider"></div>
             <div id="actions-container" style="display: flex; gap: 2px;">
                 <button id="reload-btn" class="nav-btn" title="Reload">
@@ -42,6 +47,12 @@
         </div>
         <div class="content">
             <iframe id="main-frame" src="about:blank" frameborder="0"></iframe>
+        </div>
+        <div id="search-overlay" class="overlay" style="display: none;">
+            <div class="overlay-content">
+                <input type="text" id="search-input" placeholder="Enter URL or Search...">
+                <div class="overlay-hints">Press Enter to Load / Search</div>
+            </div>
         </div>
     </div>
     <div id="custom-tooltip" class="tooltip-container">

@@ -18,6 +18,7 @@ body, html {
     display: flex;
     height: 100vh;
     width: 100vw;
+    position: relative; /* Add this for overlay positioning */
 }
 
 .sidebar-container.pos-top {
@@ -244,4 +245,79 @@ body, html {
     opacity: 0.8;
     font-size: 11px;
     color: #bdc1c6;
+}
+
+/* Overlay Styles */
+.overlay {
+    position: absolute; /* Changed from fixed to absolute */
+    top: 44px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 44px);
+    background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
+    backdrop-filter: blur(12px);
+    z-index: 9999; /* Higher z-index to stay above iframe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.sidebar-container.pos-left .overlay { left: 44px; width: calc(100% - 44px); height: 100%; top: 0; }
+.sidebar-container.pos-right .overlay { right: 44px; width: calc(100% - 44px); height: 100%; top: 0; left: auto; }
+
+.overlay-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid #eee;
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #0060df;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.overlay-hints {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+}
+
+/* Pin Button Styles */
+.pin-btn {
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+    color: #999;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.dropdown-item:hover .pin-btn {
+    opacity: 1;
+}
+
+.pin-btn:hover {
+    color: #e91e63;
+    background: rgba(233, 30, 99, 0.1);
+}
+
+.pin-btn.pinned {
+    opacity: 1;
+    color: #e91e63;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

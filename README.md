@@ -54,7 +54,11 @@ Install directly from the [Firefox Add-on Store](https://addons.mozilla.org/vi/f
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+Contributions are welcome! Whether you're fixing a bug, adding a new feature, or improving documentation, your help is appreciated.
+
+- **For Users**: Feel free to open [issues](https://github.com/PhuongPN6689/tab-in-side/issues).
+- **For Developers**: Check out our [Getting Started Guide (CONTRIBUTING.md)](CONTRIBUTING.md) for a deep dive into the architecture and setup.
+
 
 ## 📄 License
 

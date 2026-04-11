@@ -13,6 +13,7 @@ const historyToolbarLimitInput = document.getElementById('history-toolbar-limit'
 const historyStorageLimitInput = document.getElementById('history-storage-limit');
 const zoomLevelInput = document.getElementById('zoom-level');
 const toolbarPositionInput = document.getElementById('toolbar-position');
+const searchEngineInput = document.getElementById('search-engine');
 const resetBtn = document.getElementById('reset-btn');
 
 // Modal Elements
@@ -55,7 +56,7 @@ async function loadConfig() {
  */
 async function loadOptions() {
   await loadConfig();
-  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level', 'toolbar_position']);
+  const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level', 'toolbar_position', 'search_engine']);
 
   // Set default URL
   defaultUrlInput.value = data.default_url || DEFAULT_SETTINGS.default_url;
@@ -72,6 +73,9 @@ async function loadOptions() {
 
   // Set toolbar position
   toolbarPositionInput.value = data.toolbar_position || DEFAULT_SETTINGS.toolbar_position;
+
+  // Set search engine
+  searchEngineInput.value = data.search_engine || DEFAULT_SETTINGS.search_engine;
 
   // Clear existing quick URLs
   const existingRows = container.querySelectorAll('.quick-access-row:not(.header-row)');
@@ -341,6 +345,7 @@ async function saveOptions() {
   const history_storage_limit = parseInt(historyStorageLimitInput.value) || DEFAULT_SETTINGS.history_storage_limit;
   const zoom_level = parseInt(zoomLevelInput.value) || DEFAULT_SETTINGS.zoom_level;
   const toolbar_position = toolbarPositionInput.value || DEFAULT_SETTINGS.toolbar_position;
+  const search_engine = searchEngineInput.value || DEFAULT_SETTINGS.search_engine;
   const rows = container.querySelectorAll('.quick-access-row:not(.header-row)');
 
   const quick_urls = [];
@@ -369,6 +374,7 @@ async function saveOptions() {
     history_storage_limit,
     zoom_level,
     toolbar_position,
+    search_engine,
     quick_urls
   });
 

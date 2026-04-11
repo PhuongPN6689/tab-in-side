@@ -73,6 +73,12 @@ browser.runtime.onInstalled.addListener(async () => {
     contexts: ["page", "link", "bookmark"]
   });
 
+  browser.menus.create({
+    id: "search-in-sidebar",
+    title: "Search '%s' in Side",
+    contexts: ["selection"]
+  });
+
   await updateNetRules();
 });
 
@@ -93,13 +99,43 @@ browser.menus.onShown.addListener((info, tab) => {
   }
   
   browser.menus.update("open-in-sidebar", { title });
-  browser.menus.refresh();
+  
+  if (info.selectionText) {
+    (async () => {
+      const [data, defaults] = await Promise.all([
+        browser.storage.local.get('search_engine'),
+        fetch('config/defaults.json').then(r => r.json())
+      ]);
+      const engine = data.search_engine || defaults.search_engine;
+      const engineName = engine.charAt(0).toUpperCase() + engine.slice(1);
+      
+      let selection = info.selectionText;
+      if (selection.length > 20) selection = selection.substring(0, 17) + "...";
+      
+      browser.menus.update("search-in-sidebar", { 
+        title: `Search "${selection}" in ${engineName}` 
+      });
+      browser.menus.refresh();
+    })();
+  } else {
+    browser.menus.refresh();
+  }
 });
 
 // Listener for context menu clicks
 browser.menus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "open-in-sidebar") {
+  if (info.menuItemId === "open-in-sidebar" || info.menuItemId === "search-in-sidebar") {
     let urlToLoad = info.linkUrl || info.pageUrl;
+    
+    if (info.menuItemId === "search-in-sidebar" && info.selectionText) {
+      const [data, defaults] = await Promise.all([
+        browser.storage.local.get('search_engine'),
+        fetch('config/defaults.json').then(r => r.json())
+      ]);
+      const engine = data.search_engine || defaults.search_engine;
+      const baseUrl = defaults.search_engines[engine];
+      urlToLoad = baseUrl + encodeURIComponent(info.selectionText);
+    }
     
     // If it's a bookmark, we need to fetch the URL using the ID
     if (info.bookmarkId) {
@@ -116,7 +152,9 @@ browser.menus.onClicked.addListener(async (info, tab) => {
     if (urlToLoad) {
       // Determine title
       let titleToSave = info.linkText || tab.title || urlToLoad;
-      if (info.bookmarkId) {
+      if (info.menuItemId === "search-in-sidebar") {
+        titleToSave = `Search: ${info.selectionText}`;
+      } else if (info.bookmarkId) {
         try {
           const bookmarks = await browser.bookmarks.get(info.bookmarkId);
           if (bookmarks[0] && bookmarks[0].title) {

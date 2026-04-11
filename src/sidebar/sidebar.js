@@ -6,6 +6,18 @@ const settingsBtn = document.getElementById('settings-btn');
 const tooltipContainer = document.getElementById('custom-tooltip');
 const tooltipTitle = tooltipContainer.querySelector('.tooltip-title');
 const tooltipUrl = tooltipContainer.querySelector('.tooltip-url');
+const addUrlBtn = document.getElementById('add-url-btn');
+const searchOverlay = document.getElementById('search-overlay');
+const searchOverlayContent = searchOverlay.querySelector('.overlay-content');
+const searchInput = document.getElementById('search-input');
+const historyDropdownContainer = document.getElementById('history-dropdown-container');
+const historyDropdownBtn = document.getElementById('history-dropdown-btn');
+const historyDropdownMenu = document.getElementById('history-dropdown-menu');
+const actionsContainer = document.getElementById('actions-container');
+const reloadBtn = document.getElementById('reload-btn');
+const copyLinkBtn = document.getElementById('copy-link-btn');
+const openTabBtn = document.getElementById('open-tab-btn');
+const sidebarContainer = document.querySelector('.sidebar-container');
 
 // Tooltip Management
 function showTooltip(e, title, url) {
@@ -24,19 +36,9 @@ function showTooltip(e, title, url) {
   
   let top, left;
   
-  if (toolbarPosition === 'left') {
-    // Position to the right of the button
-    top = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
-    left = rect.right + 8;
-  } else if (toolbarPosition === 'right') {
-    // Position to the left of the button
-    top = rect.top + (rect.height / 2) - (tooltipRect.height / 2);
-    left = rect.left - tooltipRect.width - 8;
-  } else {
-    // Position below the button (top position)
-    top = rect.bottom + 8;
-    left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-  }
+  // Always position below the button
+  top = rect.bottom + 8;
+  left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
   
   // Keep within viewport (horizontal)
   if (left < 4) left = 4;
@@ -144,9 +146,6 @@ function createToolbarButton(title, url, isHistory = false, zoom = null, mobile 
   return btn;
 }
 
-const historyDropdownContainer = document.getElementById('history-dropdown-container');
-const historyDropdownBtn = document.getElementById('history-dropdown-btn');
-const historyDropdownMenu = document.getElementById('history-dropdown-menu');
 
 /**
  * Update button tooltips/titles and favicons from settings
@@ -178,7 +177,6 @@ async function updateButtonUI() {
     const isVertical = (toolbarPosition === 'left' || toolbarPosition === 'right');
     const toolbarSize = isVertical ? toolbar.clientHeight : toolbar.clientWidth;
     const quickSize = isVertical ? (quickBtnsContainer.offsetHeight || 100) : (quickBtnsContainer.offsetWidth || 100);
-    const actionsContainer = document.getElementById('actions-container');
     const navBtnsSize = isVertical ? (actionsContainer?.offsetHeight || 144) : (actionsContainer?.offsetWidth || 144);
     const dividerSize = 10; 
     
@@ -231,6 +229,24 @@ async function updateButtonUI() {
         divItem.appendChild(img);
         divItem.appendChild(titleSpan);
         
+        // Add Pin Button
+        const pinBtn = document.createElement('button');
+        pinBtn.className = 'pin-btn';
+        const isPinned = quickUrls.some(q => q.url === hUrl);
+        if (isPinned) pinBtn.classList.add('pinned');
+        pinBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+            </svg>`;
+        pinBtn.title = isPinned ? 'Pinned to Quick Access' : 'Pin to Quick Access';
+        
+        pinBtn.onclick = async (e) => {
+          e.stopPropagation();
+          await togglePin(hTitle, hUrl);
+        };
+        
+        divItem.appendChild(pinBtn);
+        
         divItem.onclick = () => {
           updateIframe(hUrl);
           historyDropdownMenu.classList.remove('show');
@@ -252,7 +268,7 @@ async function updateButtonUI() {
  */
 async function initSidebar() {
   const [data, defaults, defaultQuickUrls] = await Promise.all([
-    browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level', 'toolbar_position']),
+    browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level', 'toolbar_position', 'search_engine']),
     fetch('../config/defaults.json').then(r => r.json()),
     fetch('../config/quick_urls.json').then(r => r.json())
   ]);
@@ -260,11 +276,14 @@ async function initSidebar() {
   mobileViewEnabled = (data.mobile_view !== undefined) ? data.mobile_view : defaults.mobile_view;
   zoomLevel = data.zoom_level || defaults.zoom_level;
   toolbarPosition = data.toolbar_position || defaults.toolbar_position;
+  const searchEngine = data.search_engine || defaults.search_engine;
+  const searchBaseUrl = defaults.search_engines[searchEngine];
   
   // Apply toolbar position
-  const container = document.querySelector('.sidebar-container');
-  container.classList.remove('pos-top', 'pos-left', 'pos-right');
-  container.classList.add(`pos-${toolbarPosition}`);
+  document.body.classList.remove('pos-top', 'pos-left', 'pos-right');
+  document.body.classList.add(`pos-${toolbarPosition}`);
+  sidebarContainer.classList.remove('pos-top', 'pos-left', 'pos-right');
+  sidebarContainer.classList.add(`pos-${toolbarPosition}`);
 
   if (data.quick_urls) {
     quickUrls = data.quick_urls;
@@ -278,6 +297,9 @@ async function initSidebar() {
   const targetUrl = data.last_requested_url || data.default_url || defaults.default_url || (quickUrls[0]?.url);
   if (targetUrl) updateIframe(targetUrl);
 
+  // Init Search Overlay
+  initSearchOverlay(searchBaseUrl);
+
   // Clear the transient URL so next time it opens manually, it goes to homepage
   if (data.last_requested_url) {
     await browser.storage.local.remove('last_requested_url');
@@ -290,7 +312,6 @@ settingsBtn.onclick = () => {
 };
 attachTooltip(settingsBtn, 'Settings', 'Extension Options');
 
-const reloadBtn = document.getElementById('reload-btn');
 reloadBtn.onclick = () => {
   // Simplest and most reliable way to reload a cross-origin iframe
   if (iframe.src) {
@@ -299,7 +320,6 @@ reloadBtn.onclick = () => {
 };
 attachTooltip(reloadBtn, 'Reload', 'Refresh current page');
 
-const copyLinkBtn = document.getElementById('copy-link-btn');
 copyLinkBtn.onclick = async () => {
   const url = iframe.src;
   if (url && url !== 'about:blank') {
@@ -323,7 +343,6 @@ copyLinkBtn.onclick = async () => {
 };
 attachTooltip(copyLinkBtn, 'Copy Link', 'Copy current page URL');
 
-const openTabBtn = document.getElementById('open-tab-btn');
 openTabBtn.onclick = () => {
   const url = iframe.src;
   if (url && url !== 'about:blank') {
@@ -340,11 +359,47 @@ historyDropdownBtn.onclick = (e) => {
 attachTooltip(historyDropdownBtn, 'More History', 'Show all browsing history');
 
 // Close dropdown when clicking outside
-window.onclick = () => {
+window.onclick = (e) => {
   if (historyDropdownMenu.classList.contains('show')) {
     historyDropdownMenu.classList.remove('show');
   }
+  if (searchOverlay.style.display === 'flex' && !searchOverlayContent.contains(e.target) && e.target !== addUrlBtn) {
+    searchOverlay.style.display = 'none';
+  }
 };
+
+function initSearchOverlay(searchBaseUrl) {
+  addUrlBtn.onclick = () => {
+    const isVisible = searchOverlay.style.display === 'flex';
+    searchOverlay.style.display = isVisible ? 'none' : 'flex';
+    if (!isVisible) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+  };
+  
+  searchInput.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      let val = searchInput.value.trim();
+      if (!val) return;
+      
+      let targetUrl = val;
+      // Simple URL detection
+      const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+      if (!urlPattern.test(val) && !val.startsWith('localhost')) {
+        targetUrl = searchBaseUrl + encodeURIComponent(val);
+      } else if (!val.startsWith('http')) {
+        targetUrl = 'https://' + val;
+      }
+      
+      updateIframe(targetUrl);
+      searchOverlay.style.display = 'none';
+    }
+    if (e.key === 'Escape') {
+      searchOverlay.style.display = 'none';
+    }
+  };
+}
 
 // Handle window resize to recalculate overflow
 window.onresize = () => {
@@ -369,7 +424,7 @@ browser.storage.onChanged.addListener((changes, area) => {
       updateButtonUI();
     }
     if (changes.history) {
-      historyUrls = changes.history.newValue;
+      historyUrls = changes.history.newValue || [];
       updateButtonUI();
     }
     if (changes.history_toolbar_limit) {
@@ -384,13 +439,37 @@ browser.storage.onChanged.addListener((changes, area) => {
     }
     if (changes.toolbar_position) {
       toolbarPosition = changes.toolbar_position.newValue || 'top';
-      const container = document.querySelector('.sidebar-container');
-      container.classList.remove('pos-top', 'pos-left', 'pos-right');
-      container.classList.add(`pos-${toolbarPosition}`);
+      sidebarContainer.classList.remove('pos-top', 'pos-left', 'pos-right');
+      sidebarContainer.classList.add(`pos-${toolbarPosition}`);
+      document.body.classList.remove('pos-top', 'pos-left', 'pos-right');
+      document.body.classList.add(`pos-${toolbarPosition}`);
       updateButtonUI();
     }
   }
 });
+
+/**
+ * Toggle Pin for a URL
+ */
+async function togglePin(title, url) {
+  let currentQuick = Array.isArray(quickUrls) ? [...quickUrls] : [];
+  
+  const index = currentQuick.findIndex(q => q.url === url);
+  if (index > -1) {
+    // Unpin
+    currentQuick.splice(index, 1);
+  } else {
+    // Pin
+    if (currentQuick.length >= 10) {
+      alert('Quick Access limit reached (10). Please remove one first.');
+      return;
+    }
+    currentQuick.push({ name: title, url: url, zoom: zoomLevel, mobile: mobileViewEnabled });
+  }
+  
+  await browser.storage.local.set({ quick_urls: currentQuick });
+  // storage.onChanged will handle UI update
+}
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', initSidebar);

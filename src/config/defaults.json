@@ -5,5 +5,13 @@
   "history_storage_limit": 30,
   "zoom_level": 90,
   "toolbar_position": "top",
+  "search_engine": "google",
+  "search_engines": {
+    "google": "https://www.google.com/search?q=",
+    "bing": "https://www.bing.com/search?q=",
+    "duckduckgo": "https://duckduckgo.com/?q=",
+    "yahoo": "https://search.yahoo.com/search?p=",
+    "baidu": "https://www.baidu.com/s?wd="
+  },
   "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
 }
