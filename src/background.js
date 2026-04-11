@@ -7,8 +7,12 @@ const EXTENSION_ORIGIN = browser.runtime.getURL('').slice(0, -1);
  * Update declarativeNetRequest rules based on settings
  */
 async function updateNetRules() {
-  const data = await browser.storage.local.get('mobile_view');
-  const mobileViewEnabled = data.mobile_view !== false; // Default to true
+  const [data, defaults] = await Promise.all([
+    browser.storage.local.get('mobile_view'),
+    fetch('config/defaults.json').then(r => r.json())
+  ]);
+  
+  const mobileViewEnabled = (data.mobile_view !== undefined) ? data.mobile_view : defaults.mobile_view;
 
   const rules = [];
 
@@ -40,7 +44,7 @@ async function updateNetRules() {
           {
             header: "User-Agent",
             operation: "set",
-            value: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
+            value: defaults.user_agent
           }
         ]
       },
@@ -122,9 +126,13 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       }
 
       // Update History
-      const data = await browser.storage.local.get(['history', 'history_storage_limit']);
+      const [data, defaults] = await Promise.all([
+        browser.storage.local.get(['history', 'history_storage_limit']),
+        fetch('config/defaults.json').then(r => r.json())
+      ]);
+      
       let history = data.history || [];
-      const limit = data.history_storage_limit || 30;
+      const limit = data.history_storage_limit || defaults.history_storage_limit;
 
       // Remove if exists to re-insert at front (checking by URL)
       history = history.filter(item => {

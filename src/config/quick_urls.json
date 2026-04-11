@@ -1,0 +1,8 @@
+[
+  { "name": "Google", "url": "https://www.google.com", "zoom": 90, "mobile": true, "icon": "" },
+  { "name": "YouTube", "url": "https://www.youtube.com", "zoom": 90, "mobile": true, "icon": "" },
+  { "name": "Translate", "url": "https://translate.google.com", "zoom": 100, "mobile": false, "icon": "" },
+  { "name": "ChatGPT", "url": "https://chat.openai.com", "zoom": 90, "mobile": false, "icon": "" },
+  { "name": "Google Docs", "url": "https://docs.google.com/document", "zoom": 90, "mobile": false, "icon": "https://ssl.gstatic.com/docs/documents/images/kix-favicon-2023q4.ico" },
+  { "name": "Google Sheets", "url": "https://docs.google.com/spreadsheets", "zoom": 90, "mobile": false, "icon": "https://ssl.gstatic.com/docs/spreadsheets/spreadsheets_2023q4.ico" }
+]

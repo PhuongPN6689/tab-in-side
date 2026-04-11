@@ -73,8 +73,6 @@ let mobileViewEnabled = true;
 let zoomLevel = 90;
 let toolbarPosition = 'top';
 
-const MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
-
 /**
  * Update the iframe source
  * @param {string} url 
@@ -253,11 +251,15 @@ async function updateButtonUI() {
  * Load initial state from storage
  */
 async function initSidebar() {
-  const data = await browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level', 'toolbar_position']);
+  const [data, defaults, defaultQuickUrls] = await Promise.all([
+    browser.storage.local.get(['last_requested_url', 'quick_urls', 'default_url', 'history', 'mobile_view', 'zoom_level', 'toolbar_position']),
+    fetch('../config/defaults.json').then(r => r.json()),
+    fetch('../config/quick_urls.json').then(r => r.json())
+  ]);
   
-  mobileViewEnabled = data.mobile_view !== false; // Default to true
-  zoomLevel = data.zoom_level || 90;
-  toolbarPosition = data.toolbar_position || 'top';
+  mobileViewEnabled = (data.mobile_view !== undefined) ? data.mobile_view : defaults.mobile_view;
+  zoomLevel = data.zoom_level || defaults.zoom_level;
+  toolbarPosition = data.toolbar_position || defaults.toolbar_position;
   
   // Apply toolbar position
   const container = document.querySelector('.sidebar-container');
@@ -267,18 +269,13 @@ async function initSidebar() {
   if (data.quick_urls) {
     quickUrls = data.quick_urls;
   } else {
-    // Fallback if not set yet
-    quickUrls = [
-      { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true },
-      { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true },
-      { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true }
-    ];
+    quickUrls = defaultQuickUrls;
   }
 
   historyUrls = data.history || [];
   await updateButtonUI();
   
-  const targetUrl = data.last_requested_url || data.default_url || (quickUrls[0]?.url);
+  const targetUrl = data.last_requested_url || data.default_url || defaults.default_url || (quickUrls[0]?.url);
   if (targetUrl) updateIframe(targetUrl);
 
   // Clear the transient URL so next time it opens manually, it goes to homepage

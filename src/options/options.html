@@ -7,160 +7,315 @@
         :root {
             --primary: #0060df;
             --primary-hover: #003eaa;
-            --bg: #f0f2f5;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
-            --border: #e0e0e0;
-            --text: #1a1a1a;
-            --text-muted: #5f6368;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
             --section-bg: #ffffff;
+            --accent: #ef4444;
+            --success: #10b981;
         }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 20px; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            padding: 40px 20px; 
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
         }
         .container {
-            max-width: 650px;
+            max-width: 900px;
             margin: auto;
         }
-        h1 { margin-bottom: 24px; font-size: 22px; color: var(--text); font-weight: 700; text-align: center; }
+        h1 { margin-bottom: 32px; font-size: 28px; color: var(--text); font-weight: 800; text-align: center; letter-spacing: -0.02em; }
         
         .section {
             background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
         }
-        h2 { font-size: 16px; margin: 0 0 20px; color: var(--text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        h2 { font-size: 18px; margin: 0 0 24px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        h2::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--primary); border-radius: 2px; }
         
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 24px; }
         .form-group:last-child { margin-bottom: 0; }
         
-        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: var(--text); }
         
-        input[type="text"], input[type="number"] { 
+        input[type="text"], input[type="number"], select { 
             box-sizing: border-box;
-        }
-        input[type="text"] { 
             width: 100%; 
-            padding: 10px 12px; 
+            padding: 12px 16px; 
             border: 1px solid var(--border); 
-            border-radius: 8px; 
-            box-sizing: border-box;
+            border-radius: 10px; 
             font-size: 14px;
-            transition: all 0.2s;
-            background: #fafafa;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
         }
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(0, 96, 223, 0.1);
+            box-shadow: 0 0 0 4px rgba(0, 96, 223, 0.1);
         }
 
         .setting-row, .setting-row-alt {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
-            padding: 12px 0;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
+        .setting-row:last-child { border-bottom: none; }
         .setting-row-alt {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 0 -12px 16px -12px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
         }
 
         .number-input {
-            width: 82px; 
+            width: 90px !important; 
             flex-shrink: 0;
-            padding: 8px 5px; 
-            border: 1px solid var(--border); 
-            border-radius: 6px;
-            font-size: 14px;
             text-align: center;
         }
 
         .checkbox-input {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
+            accent-color: var(--primary);
         }
 
+        /* Quick Access Styles */
+        #quick-urls-container {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
         .quick-access-row {
             display: grid;
-            grid-template-columns: 110px 1fr 1fr 65px 60px 32px;
-            gap: 12px;
-            margin-bottom: 12px;
+            grid-template-columns: 32px 140px 1fr 1fr 75px 60px 40px;
+            gap: 16px;
+            padding: 16px;
             align-items: center;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
         }
-        .header-row label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .header-row label:nth-child(4), .header-row label:nth-child(5) { text-align: center; }
+        .quick-access-row:last-child { border-bottom: none; }
+        .quick-access-row.header-row {
+            background: #f8fafc;
+            font-weight: 700;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .quick-access-row.header-row span { text-align: center; }
+        
+        .drag-handle {
+            cursor: grab;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            user-select: none;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        
+        .quick-access-row.dragging {
+            opacity: 0.5;
+            background: #f1f5f9;
+        }
+        .quick-access-row.drag-over {
+            border-top: 2px solid var(--primary);
+        }
 
+        /* Button Styles */
         .actions {
-            margin-top: 32px;
+            margin-top: 40px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            background: #fff;
-            padding: 20px 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: transparent;
+            padding: 0;
         }
         button { 
-            padding: 10px 24px; 
+            padding: 12px 28px; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             cursor: pointer; 
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
-            transition: all 0.2s;
-            min-width: 160px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         #save-btn {
             background: var(--primary); 
             color: white; 
+            box-shadow: 0 4px 6px -1px rgba(0, 96, 223, 0.2);
+            min-width: 200px;
         }
-        #save-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        #save-btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 96, 223, 0.3); }
         #save-btn:active { transform: translateY(0); }
         
         .secondary-btn {
-            background: #f1f3f4;
-            color: #3c4043;
-            border: 1px solid #dadce0;
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid var(--border);
         }
-        .secondary-btn:hover { background: #e8eaed; }
-        .secondary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .secondary-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        
+        .add-btn-main {
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            width: 100%;
+            margin-top: 16px;
+            padding: 16px;
+            font-size: 15px;
+        }
+        .add-btn-main:hover { background: #eef2ff; border-style: solid; }
 
         .delete-btn {
             background: transparent;
-            color: #5f6368;
+            color: #94a3b8;
             font-size: 20px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
+            padding: 8px;
+            border-radius: 8px;
             min-width: unset;
         }
-        .delete-btn:hover { color: #d93025; background: #fee8e6; border-radius: 50%; }
+        .delete-btn:hover { color: var(--accent); background: #fef2f2; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal {
+            background: #fff;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { margin: 0; font-size: 20px; font-weight: 800; }
+        .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; padding: 4px; }
+        
+        .modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        /* Suggested Links Styles */
+        .suggested-section {
+            margin-top: 32px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .suggested-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tag-pill {
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tag-pill:hover { border-color: var(--primary); color: var(--primary); }
+        .tag-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .suggestion-card {
+            background: #fff;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .suggestion-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .suggestion-icon { width: 24px; height: 24px; object-fit: contain; }
+        .suggestion-name { font-size: 13px; font-weight: 600; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .status {
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             font-size: 14px;
-            color: #1e8e3e;
-            font-weight: 500;
+            color: var(--success);
+            font-weight: 700;
             display: none;
+            padding: 12px 24px;
+            background: #ecfdf5;
+            border-radius: 10px;
+            border: 1px solid #d1fae5;
         }
         .help-text {
             font-size: 12px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -216,7 +371,7 @@
                     <label>Toolbar Position</label>
                     <div class="help-text">Choose the placement of the navigation bar.</div>
                 </div>
-                <select id="toolbar-position" class="number-input" style="width: 100px;">
+                <select id="toolbar-position" class="number-input" style="width: 120px;">
                     <option value="top">Top</option>
                     <option value="left">Left</option>
                     <option value="right">Right</option>
@@ -226,30 +381,82 @@
 
         <div class="section">
             <h2>Quick Access Buttons</h2>
+            <div class="help-text" style="margin-bottom: 16px;">Drag the handles (⠿) to reorder your links. Maximum 10 buttons.</div>
             <div id="quick-urls-container">
                 <div class="quick-access-row header-row">
+                    <span></span> <!-- Drag handle -->
                     <label>Display Name</label>
                     <label>Target URL</label>
-                    <label>Icon URL (Optional)</label>
+                    <label>Icon URL</label>
                     <label style="text-align: center;">Zoom (%)</label>
                     <label style="text-align: center;">Mobile</label>
-                    <span></span>
+                    <span></span> <!-- Actions -->
                 </div>
                 <!-- Rows will be injected by options.js -->
             </div>
 
-            <button id="add-btn" class="secondary-btn" style="margin-top: 15px;">+ Add New Button</button>
-            <div class="help-text" style="margin-top: 8px;">Maximum 10 buttons allowed.</div>
+            <button id="add-btn" class="add-btn-main">+ Add New Button</button>
         </div>
 
         <div class="actions">
             <div id="status" class="status">Settings saved successfully!</div>
-            <div style="display: flex; gap: 12px; width: 100%; justify-content: center;">
-                <button id="save-btn">Save Settings</button>
+            <div style="display: flex; gap: 16px; width: 100%; justify-content: center;">
+                <button id="save-btn">Save All Settings</button>
                 <button id="reset-btn" class="secondary-btn">Reset to Defaults</button>
             </div>
         </div>
     </div>
+
+    <!-- Add Link Modal -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add New Shortcut</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="modal-name" placeholder="e.g. ChatGPT">
+                    </div>
+                    <div class="form-group">
+                        <label>Icon URL (Optional)</label>
+                        <input type="text" id="modal-icon" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Target URL</label>
+                    <input type="text" id="modal-url" placeholder="https://chat.openai.com">
+                </div>
+                <div style="display: flex; gap: 24px; align-items: center; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label style="margin-bottom: 0;">Zoom:</label>
+                        <input type="number" id="modal-zoom" value="100" min="10" max="200" step="10" class="number-input" style="width: 80px !important;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="checkbox" id="modal-mobile" checked class="checkbox-input">
+                        <label style="margin-bottom: 0;">Mobile View</label>
+                    </div>
+                </div>
+
+                <div class="suggested-section">
+                    <div class="suggested-title">Suggested Shortcuts</div>
+                    <div class="tags-container" id="tags-container">
+                        <!-- Tags will be injected -->
+                    </div>
+                    <div class="suggestions-grid" id="suggestions-grid">
+                        <!-- Suggestions will be injected -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" id="modal-cancel">Cancel</button>
+                <button id="modal-add-btn" style="background: var(--primary); color: #fff;">Confirm Add</button>
+            </div>
+        </div>
+    </div>
+
     <script src="options.js"></script>
 </body>
 </html>

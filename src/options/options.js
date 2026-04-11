@@ -1,18 +1,8 @@
 // Tab in Side Options Logic
 
-const DEFAULT_SETTINGS = {
-  default_url: 'https://www.google.com',
-  quick_urls: [
-    { name: 'Google', url: 'https://www.google.com', zoom: 90, mobile: true, icon: '' },
-    { name: 'Translate', url: 'https://translate.google.com', zoom: 100, mobile: true, icon: '' },
-    { name: 'YouTube', url: 'https://www.youtube.com', zoom: 90, mobile: true, icon: '' }
-  ],
-  mobile_view: true,
-  history_toolbar_limit: 3,
-  history_storage_limit: 30,
-  zoom_level: 90,
-  toolbar_position: 'top'
-};
+let DEFAULT_SETTINGS = {};
+let QUICK_URLS = [];
+let SUGGESTED_LINKS = [];
 
 const container = document.getElementById('quick-urls-container');
 const saveBtn = document.getElementById('save-btn');
@@ -25,12 +15,46 @@ const zoomLevelInput = document.getElementById('zoom-level');
 const toolbarPositionInput = document.getElementById('toolbar-position');
 const resetBtn = document.getElementById('reset-btn');
 
+// Modal Elements
+const addModal = document.getElementById('add-modal');
+const modalClose = document.getElementById('modal-close');
+const modalCancel = document.getElementById('modal-cancel');
+const modalAddBtn = document.getElementById('modal-add-btn');
+const modalName = document.getElementById('modal-name');
+const modalUrl = document.getElementById('modal-url');
+const modalIcon = document.getElementById('modal-icon');
+const modalZoom = document.getElementById('modal-zoom');
+const modalMobile = document.getElementById('modal-mobile');
+const tagsContainer = document.getElementById('tags-container');
+const suggestionsGrid = document.getElementById('suggestions-grid');
+
 const MAX_BUTTONS = 10;
+let activeTag = 'All';
+
+/**
+ * Fetch configuration from JSON files
+ */
+async function loadConfig() {
+  try {
+    const [defaults, quickUrls, suggestions] = await Promise.all([
+      fetch('../config/defaults.json').then(r => r.json()),
+      fetch('../config/quick_urls.json').then(r => r.json()),
+      fetch('../config/suggested_links.json').then(r => r.json())
+    ]);
+    
+    DEFAULT_SETTINGS = defaults;
+    QUICK_URLS = quickUrls;
+    SUGGESTED_LINKS = suggestions;
+  } catch (error) {
+    console.error('Error loading config:', error);
+  }
+}
 
 /**
  * Initialize options UI
  */
 async function loadOptions() {
+  await loadConfig();
   const data = await browser.storage.local.get(['default_url', 'quick_urls', 'mobile_view', 'history_toolbar_limit', 'history_storage_limit', 'zoom_level', 'toolbar_position']);
 
   // Set default URL
@@ -54,18 +78,26 @@ async function loadOptions() {
   existingRows.forEach(row => row.remove());
 
   // Set quick URLs
-  const quickUrls = data.quick_urls || DEFAULT_SETTINGS.quick_urls;
+  const quickUrls = data.quick_urls || QUICK_URLS;
 
   quickUrls.forEach((item) => {
     createRow(item.name, item.url, item.zoom, (item.mobile !== undefined ? item.mobile : true), item.icon);
   });
 
   updateAddButtonState();
+  initDragAndDrop();
+  renderSuggestions();
 }
 
 function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = true, iconValue = '') {
   const row = document.createElement('div');
   row.className = 'quick-access-row';
+  row.draggable = true;
+
+  const dragHandle = document.createElement('div');
+  dragHandle.className = 'drag-handle';
+  dragHandle.innerHTML = '⠿';
+  dragHandle.title = 'Drag to reorder';
 
   const nameInput = document.createElement('input');
   nameInput.type = 'text';
@@ -108,6 +140,7 @@ function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = 
     updateAddButtonState();
   };
 
+  row.appendChild(dragHandle);
   row.appendChild(nameInput);
   row.appendChild(urlInput);
   row.appendChild(iconInput);
@@ -117,19 +150,186 @@ function createRow(nameValue = '', urlValue = '', zoomValue = 90, mobileValue = 
 
   container.appendChild(row);
   updateAddButtonState();
+  
+  // Re-init drag and drop for new rows
+  initDragAndDrop();
 }
 
 function updateAddButtonState() {
   const count = container.querySelectorAll('.quick-access-row:not(.header-row)').length;
   addBtn.disabled = count >= MAX_BUTTONS;
+  if (count >= MAX_BUTTONS) {
+    addBtn.classList.add('disabled');
+  } else {
+    addBtn.classList.remove('disabled');
+  }
 }
 
+// Drag and Drop Logic
+function initDragAndDrop() {
+  const rows = container.querySelectorAll('.quick-access-row:not(.header-row)');
+  
+  rows.forEach(row => {
+    row.addEventListener('dragstart', handleDragStart);
+    row.addEventListener('dragover', handleDragOver);
+    row.addEventListener('dragenter', handleDragEnter);
+    row.addEventListener('dragleave', handleDragLeave);
+    row.addEventListener('drop', handleDrop);
+    row.addEventListener('dragend', handleDragEnd);
+  });
+}
+
+let dragSrcEl = null;
+
+function handleDragStart(e) {
+  this.classList.add('dragging');
+  dragSrcEl = this;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.innerHTML);
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = 'move';
+  return false;
+}
+
+function handleDragEnter(e) {
+  this.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+
+  if (dragSrcEl !== this) {
+    // Swap row content or move row in DOM
+    const allRows = Array.from(container.querySelectorAll('.quick-access-row:not(.header-row)'));
+    const srcIndex = allRows.indexOf(dragSrcEl);
+    const targetIndex = allRows.indexOf(this);
+
+    if (srcIndex < targetIndex) {
+      this.after(dragSrcEl);
+    } else {
+      this.before(dragSrcEl);
+    }
+  }
+  return false;
+}
+
+function handleDragEnd(e) {
+  const rows = container.querySelectorAll('.quick-access-row');
+  rows.forEach(row => {
+    row.classList.remove('dragging');
+    row.classList.remove('drag-over');
+  });
+}
+
+// Modal Logic
 addBtn.addEventListener('click', () => {
   const count = container.querySelectorAll('.quick-access-row:not(.header-row)').length;
   if (count < MAX_BUTTONS) {
-    createRow();
+    openModal();
   }
 });
+
+function openModal() {
+  addModal.style.display = 'flex';
+  modalName.value = '';
+  modalUrl.value = '';
+  modalIcon.value = '';
+  modalZoom.value = 100;
+  modalMobile.checked = true;
+  modalName.focus();
+}
+
+function closeModal() {
+  addModal.style.display = 'none';
+}
+
+modalClose.addEventListener('click', closeModal);
+modalCancel.addEventListener('click', closeModal);
+window.addEventListener('click', (e) => {
+  if (e.target === addModal) closeModal();
+});
+
+modalAddBtn.addEventListener('click', () => {
+  const name = modalName.value.trim();
+  const url = modalUrl.value.trim();
+  
+  if (!name && !url) {
+    alert('Please enter at least a Name or a URL.');
+    return;
+  }
+  
+  createRow(
+    name, 
+    url, 
+    parseInt(modalZoom.value) || 100, 
+    modalMobile.checked, 
+    modalIcon.value.trim()
+  );
+  closeModal();
+});
+
+// Suggestions Logic
+function renderSuggestions() {
+  // Extract all unique tags
+  const tags = new Set(['All']);
+  SUGGESTED_LINKS.forEach(link => link.tags.forEach(tag => tags.add(tag)));
+  
+  tagsContainer.innerHTML = '';
+  tags.forEach(tag => {
+    const pill = document.createElement('div');
+    pill.className = `tag-pill ${tag === activeTag ? 'active' : ''}`;
+    pill.textContent = tag;
+    pill.onclick = () => {
+      activeTag = tag;
+      renderSuggestions();
+    };
+    tagsContainer.appendChild(pill);
+  });
+
+  suggestionsGrid.innerHTML = '';
+  const filteredLinks = activeTag === 'All' 
+    ? SUGGESTED_LINKS 
+    : SUGGESTED_LINKS.filter(link => link.tags.includes(activeTag));
+
+  filteredLinks.forEach(link => {
+    const card = document.createElement('div');
+    card.className = 'suggestion-card';
+    
+    const icon = document.createElement('img');
+    icon.className = 'suggestion-icon';
+    icon.src = link.icon;
+    icon.onerror = () => { 
+      icon.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5NGEzYjgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCI+PC9jaXJjbGU+PGxpbmUgeDE9IjIiIHkxPSIxMiIgeDI9IjIyIiB5Mj0iMTIiPjwvbGluZT48cGF0aCBkPSJNMTIgMmE1NS4zOSA1NS4zOSAwIDAgMSAwIDIwem0wIDBhNTUuMzkgNTUuMzkgMCAwIDAgMCAyMCI+PC9wYXRoPjwvc3ZnPg=='; 
+    }; // Fallback SVG globe icon
+
+    const name = document.createElement('div');
+    name.className = 'suggestion-name';
+    name.textContent = link.name;
+    
+    card.appendChild(icon);
+    card.appendChild(name);
+    
+    card.onclick = () => {
+      modalName.value = link.name;
+      modalUrl.value = link.url;
+      modalIcon.value = link.icon;
+      modalAddBtn.focus();
+    };
+    
+    suggestionsGrid.appendChild(card);
+  });
+}
 
 /**
  * Save options to storage
@@ -174,9 +374,10 @@ async function saveOptions() {
 
   // Show success message
   statusMsg.style.display = 'block';
+  statusMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
   setTimeout(() => {
     statusMsg.style.display = 'none';
-  }, 2000);
+  }, 3000);
 }
 
 /**
@@ -199,7 +400,7 @@ async function resetOptions() {
     setTimeout(() => {
       statusMsg.style.display = 'none';
       statusMsg.textContent = 'Settings saved successfully!';
-    }, 2000);
+    }, 3000);
   }
 }
 
