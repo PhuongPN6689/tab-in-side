@@ -23,10 +23,12 @@
 
 ## ✨ Core Capabilities
 
-- **Seamless Context Menu Integration**: Effortlessly open any hyperlink, current webpage, or saved bookmark directly into your browser's sidebar with a single right-click. No more switching tabs for quick lookups.
-- **Customizable Quick Access**: Features a dynamic toolbar where you can pin up to 10 of your most-visited websites for instant, one-click navigation.
-- **Smart & Scalable History Tracking**: Keeps a running list of your recently viewed sidebar pages (up to 100), with a convenient dropdown menu for full access and configurable toolbar button limits.
-- **Integrated Extension Suite**: Access the comprehensive settings dashboard directly from the sidebar to manage your homepage, quick access pins, and dual history limits (Toolbar vs. Storage) on the fly.
+- **Seamless Context Menu Integration**: Effortlessly open any hyperlink, current webpage, or saved bookmark directly into your browser's sidebar.
+- **Contextual Web Search**: Select text on any page and right-click to search using your favorite search engine directly in the sidebar panel.
+- **Integrated Search & URL Overlay**: A powerful `+` button in the toolbar opens a centered input for instant navigation—type a URL to load it or a term to search with your default engine.
+- **Customizable Quick Access**: Pin up to 10 of your most-visited websites to the toolbar for one-click navigation.
+- **Advanced History Overlay**: View your recent browsing history in a centered, compact overlay. Includes one-click pinning to save any history item to your Quick Access list.
+- **Search Engine Selection**: Choose from popular search engines (Google, Bing, DuckDuckGo, etc.) to power your sidebar searches.
 
 ## 🛠 Installation
 
@@ -48,9 +50,11 @@ Install directly from the [Firefox Add-on Store](https://addons.mozilla.org/vi/f
 ## 📖 Usage Guide
 
 1. **Open the Sidebar**: Trigger the sidebar manually or right-click any link -> *"Open in Tab in Side"*.
-2. **Browse in Mobile Mode**: Toggle "Mobile View" in the settings to force mobile layouts.
-3. **Quick Switch**: Use the icons in the toolbar to jump between pinned sites or click the **dropdown arrow** to access your full history records.
-4. **Customize**: Click the gear icon (⚙️) to set your homepage, pins, and dual history limits.
+2. **Search Selected Text**: Highlight text on any page and select *"Search '...' in Side"* to find answers without losing context.
+3. **Quick Navigation**: Click the **+** button to type a URL or search query instantly.
+4. **Manage History & Pins**: Click the **History** button to view recent pages. Use the **Pin** icon on history items to add them to your fixed toolbar.
+5. **Browse in Mobile Mode**: Toggle "Mobile View" in the settings to force responsive layouts for narrow sidebars.
+6. **Customize**: Click the gear icon (⚙️) to set your homepage, search engine, and history limits.
 
 ## 🤝 Contributing
 

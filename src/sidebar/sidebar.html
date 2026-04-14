@@ -20,13 +20,10 @@
             <div id="history-btns-container" style="display: flex; gap: 2px;">
                 <!-- History buttons will be injected by sidebar.js -->
             </div>
-            <div id="history-dropdown-container" class="dropdown-container" style="display: none;">
+            <div id="history-dropdown-container">
                 <button id="history-dropdown-btn" class="nav-btn" title="More History">
-                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
                 </button>
-                <div id="history-dropdown-menu" class="dropdown-menu">
-                    <!-- Overflow history items will be injected here -->
-                </div>
             </div>
             
             <div class="divider"></div>
@@ -52,6 +49,19 @@
             <div class="overlay-content">
                 <input type="text" id="search-input" placeholder="Enter URL or Search...">
                 <div class="overlay-hints">Press Enter to Load / Search</div>
+            </div>
+        </div>
+        <div id="history-overlay" class="overlay" style="display: none;">
+            <div class="overlay-content">
+                <div class="overlay-header">
+                    <h3>Recent History</h3>
+                    <button id="close-history-btn" class="nav-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+                <div id="history-list" class="overlay-list">
+                    <!-- History items will be injected here -->
+                </div>
             </div>
         </div>
     </div>

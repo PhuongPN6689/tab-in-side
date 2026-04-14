@@ -249,32 +249,33 @@ body, html {
 
 /* Overlay Styles */
 .overlay {
-    position: absolute; /* Changed from fixed to absolute */
+    position: absolute;
     top: 44px;
     left: 0;
     width: 100%;
     height: calc(100% - 44px);
-    background: rgba(255, 255, 255, 0.85); /* Slightly more opaque */
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
-    z-index: 9999; /* Higher z-index to stay above iframe */
+    z-index: 9999;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Push to top */
     justify-content: center;
+    padding-top: 20px; /* Add some space from the toolbar */
     animation: fadeIn 0.2s ease-out;
 }
 
-.sidebar-container.pos-left .overlay { left: 44px; width: calc(100% - 44px); height: 100%; top: 0; }
-.sidebar-container.pos-right .overlay { right: 44px; width: calc(100% - 44px); height: 100%; top: 0; left: auto; }
+.sidebar-container.pos-left .overlay { left: 44px; width: calc(100% - 44px); height: 100%; top: 0; padding-top: 20px; }
+.sidebar-container.pos-right .overlay { right: 44px; width: calc(100% - 44px); height: 100%; top: 0; left: auto; padding-top: 20px; }
 
 .overlay-content {
     background: #fff;
-    padding: 24px;
-    border-radius: 16px;
+    padding: 8px; /* Further reduced from 12px */
+    border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    width: 80%;
+    width: 90%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px; /* Further reduced from 8px */
     border: 1px solid #eee;
 }
 
@@ -292,6 +293,60 @@ body, html {
     font-size: 11px;
     color: #666;
     text-align: center;
+}
+
+.overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px; /* Reduced from 16px */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px; /* Reduced from 8px */
+}
+
+.overlay-header h3 {
+    margin: 0;
+    font-size: 14px; /* Reduced from 16px */
+    color: #333;
+}
+
+.overlay-list {
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Reduced from 4px */
+}
+
+.overlay-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 6px; /* Further reduced from 6px 8px */
+    gap: 6px; /* Further reduced from 8px */
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.overlay-item:hover {
+    background: var(--btn-hover);
+    border-color: var(--toolbar-border);
+}
+
+.overlay-item .title {
+    font-size: 13px; /* Reduced from 14px */
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.overlay-item .icon-img {
+    flex-shrink: 0;
+    width: 18px; /* Reduced from 24px */
+    height: 18px; /* Reduced from 24px */
 }
 
 /* Pin Button Styles */

@@ -122,6 +122,33 @@ browser.menus.onShown.addListener((info, tab) => {
   }
 });
 
+/**
+ * Add a URL and title to history
+ */
+async function addToHistory(url, title) {
+  const [data, defaults] = await Promise.all([
+    browser.storage.local.get(['history', 'history_storage_limit']),
+    fetch('config/defaults.json').then(r => r.json())
+  ]);
+  
+  let history = data.history || [];
+  const limit = data.history_storage_limit || defaults.history_storage_limit;
+
+  // Remove if exists to re-insert at front (checking by URL)
+  history = history.filter(item => {
+    const itemUrl = (typeof item === 'string') ? item : item.url;
+    return itemUrl !== url;
+  });
+  
+  history.unshift({ title: title, url: url });
+  history = history.slice(0, limit);
+
+  await browser.storage.local.set({ 
+    last_requested_url: url,
+    history: history
+  });
+}
+
 // Listener for context menu clicks
 browser.menus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "open-in-sidebar" || info.menuItemId === "search-in-sidebar") {
@@ -163,28 +190,7 @@ browser.menus.onClicked.addListener(async (info, tab) => {
         } catch (e) {}
       }
 
-      // Update History
-      const [data, defaults] = await Promise.all([
-        browser.storage.local.get(['history', 'history_storage_limit']),
-        fetch('config/defaults.json').then(r => r.json())
-      ]);
-      
-      let history = data.history || [];
-      const limit = data.history_storage_limit || defaults.history_storage_limit;
-
-      // Remove if exists to re-insert at front (checking by URL)
-      history = history.filter(item => {
-        const itemUrl = (typeof item === 'string') ? item : item.url;
-        return itemUrl !== urlToLoad;
-      });
-      
-      history.unshift({ title: titleToSave, url: urlToLoad });
-      history = history.slice(0, limit);
-
-      await browser.storage.local.set({ 
-        last_requested_url: urlToLoad,
-        history: history
-      });
+      await addToHistory(urlToLoad, titleToSave);
       
       try {
         await browser.sidebarAction.open();
@@ -197,5 +203,12 @@ browser.menus.onClicked.addListener(async (info, tab) => {
         url: urlToLoad
       }).catch(() => {});
     }
+  }
+});
+
+// Listener for messages from sidebar
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "ADD_HISTORY") {
+    addToHistory(message.url, message.title);
   }
 });

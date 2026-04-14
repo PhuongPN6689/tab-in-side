@@ -10,9 +10,12 @@ const addUrlBtn = document.getElementById('add-url-btn');
 const searchOverlay = document.getElementById('search-overlay');
 const searchOverlayContent = searchOverlay.querySelector('.overlay-content');
 const searchInput = document.getElementById('search-input');
+const historyOverlay = document.getElementById('history-overlay');
+const historyOverlayContent = historyOverlay.querySelector('.overlay-content');
+const historyList = document.getElementById('history-list');
+const closeHistoryBtn = document.getElementById('close-history-btn');
 const historyDropdownContainer = document.getElementById('history-dropdown-container');
 const historyDropdownBtn = document.getElementById('history-dropdown-btn');
-const historyDropdownMenu = document.getElementById('history-dropdown-menu');
 const actionsContainer = document.getElementById('actions-container');
 const reloadBtn = document.getElementById('reload-btn');
 const copyLinkBtn = document.getElementById('copy-link-btn');
@@ -167,7 +170,7 @@ async function updateButtonUI() {
 
   // 2. Render History with Overflow Detection
   historyBtnsContainer.innerHTML = '';
-  historyDropdownMenu.innerHTML = '';
+  historyList.innerHTML = '';
   
   if (historyUrls.length > 0) {
     historyDivider.style.display = 'block';
@@ -195,7 +198,7 @@ async function updateButtonUI() {
     // Toolbar shows only the most recent N items that fit
     const toolbarHistory = historyUrls.slice(0, buttonsThatFit);
     
-    // Dropdown shows EVERYTHING
+    // Overlay shows EVERYTHING
     const dropdownHistory = historyUrls;
 
     toolbarHistory.forEach((item) => {
@@ -214,7 +217,7 @@ async function updateButtonUI() {
         const hUrl = (typeof item === 'string') ? item : item.url;
 
         const divItem = document.createElement('div');
-        divItem.className = 'dropdown-item';
+        divItem.className = 'overlay-item';
         attachTooltip(divItem, hTitle, hUrl);
         
         const img = document.createElement('img');
@@ -249,10 +252,10 @@ async function updateButtonUI() {
         
         divItem.onclick = () => {
           updateIframe(hUrl);
-          historyDropdownMenu.classList.remove('show');
+          historyOverlay.style.display = 'none';
         };
         
-        historyDropdownMenu.appendChild(divItem);
+        historyList.appendChild(divItem);
       });
     } else {
       historyDropdownContainer.style.display = 'none';
@@ -351,20 +354,25 @@ openTabBtn.onclick = () => {
 };
 attachTooltip(openTabBtn, 'Open in New Tab', 'Open current page in a full browser tab');
 
-// Dropdown Toggle
+// History Overlay Toggle
 historyDropdownBtn.onclick = (e) => {
   e.stopPropagation();
-  historyDropdownMenu.classList.toggle('show');
+  const isVisible = historyOverlay.style.display === 'flex';
+  historyOverlay.style.display = isVisible ? 'none' : 'flex';
 };
-attachTooltip(historyDropdownBtn, 'More History', 'Show all browsing history');
+attachTooltip(historyDropdownBtn, 'Recent History', 'Show all browsing history');
 
-// Close dropdown when clicking outside
+closeHistoryBtn.onclick = () => {
+  historyOverlay.style.display = 'none';
+};
+
+// Close overlays when clicking outside
 window.onclick = (e) => {
-  if (historyDropdownMenu.classList.contains('show')) {
-    historyDropdownMenu.classList.remove('show');
-  }
-  if (searchOverlay.style.display === 'flex' && !searchOverlayContent.contains(e.target) && e.target !== addUrlBtn) {
+  if (searchOverlay.style.display === 'flex' && !searchOverlayContent.contains(e.target) && !addUrlBtn.contains(e.target)) {
     searchOverlay.style.display = 'none';
+  }
+  if (historyOverlay.style.display === 'flex' && !historyOverlayContent.contains(e.target) && !historyDropdownBtn.contains(e.target)) {
+    historyOverlay.style.display = 'none';
   }
 };
 
@@ -384,15 +392,26 @@ function initSearchOverlay(searchBaseUrl) {
       if (!val) return;
       
       let targetUrl = val;
+      let titleToSave = val;
+
       // Simple URL detection
       const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
       if (!urlPattern.test(val) && !val.startsWith('localhost')) {
         targetUrl = searchBaseUrl + encodeURIComponent(val);
+        titleToSave = `Search: ${val}`;
       } else if (!val.startsWith('http')) {
         targetUrl = 'https://' + val;
       }
       
       updateIframe(targetUrl);
+
+      // Save to history via background script
+      browser.runtime.sendMessage({
+        type: 'ADD_HISTORY',
+        url: targetUrl,
+        title: titleToSave
+      }).catch(() => {});
+
       searchOverlay.style.display = 'none';
     }
     if (e.key === 'Escape') {
@@ -431,7 +450,7 @@ browser.storage.onChanged.addListener((changes, area) => {
       updateButtonUI();
     }
     if (changes.mobile_view) {
-      mobileViewEnabled = changes.mobile_view.newValue !== false;
+      mobile_view_enabled = changes.mobile_view.newValue !== false;
     }
     if (changes.zoom_level) {
       zoomLevel = changes.zoom_level.newValue || 90;

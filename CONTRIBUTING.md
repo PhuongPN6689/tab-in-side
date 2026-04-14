@@ -20,6 +20,8 @@ Tab in Side is built as a standard WebExtension (Manifest V3). Here is how the c
   - A dashboard for users to customize their experience (Pinned sites, history limits, appearance).
 - **Configuration (`src/config/`)**:
   - Centralized JSON files for default settings and suggested links.
+- **Messaging System**:
+  - Uses `browser.runtime.sendMessage` to coordinate history logging between the Sidebar and Background script.
 
 ---
 
@@ -85,6 +87,12 @@ The sidebar's toolbar automatically calculates how many history buttons can fit 
 
 ### 3. Mobile View Spoofing
 To make websites look better in a narrow sidebar, we spoof the `User-Agent` to a mobile device when loading pages in the sidebar's iframe.
+
+### 4. Smart Overlays & Compact UI
+The Sidebar uses a centralized `overlay` system for Search and History. These overlays are designed for high information density, using ultra-compact spacing and top-aligned positioning to ensure usability even in narrow panels.
+
+### 5. Unified History Logging
+The extension uses a centralized `addToHistory` function in the background script. This ensures that context menu actions, direct URL entries, and sidebar searches all follow the same deduplication and storage limit rules.
 
 ---
 
