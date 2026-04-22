@@ -6,10 +6,12 @@ const settingsBtn = document.getElementById('settings-btn');
 const tooltipContainer = document.getElementById('custom-tooltip');
 const tooltipTitle = tooltipContainer.querySelector('.tooltip-title');
 const tooltipUrl = tooltipContainer.querySelector('.tooltip-url');
+const historyContextMenu = document.getElementById('history-context-menu');
 const addUrlBtn = document.getElementById('add-url-btn');
 const searchOverlay = document.getElementById('search-overlay');
 const searchOverlayContent = searchOverlay.querySelector('.overlay-content');
 const searchInput = document.getElementById('search-input');
+const openCurrentTabBtn = document.getElementById('open-current-tab-btn');
 const historyOverlay = document.getElementById('history-overlay');
 const historyOverlayContent = historyOverlay.querySelector('.overlay-content');
 const historyList = document.getElementById('history-list');
@@ -61,6 +63,11 @@ function showTooltip(e, title, url) {
 
 function hideTooltip() {
   tooltipContainer.style.display = 'none';
+}
+
+function hideHistoryContextMenu() {
+  historyContextMenu.style.display = 'none';
+  historyContextMenu.innerHTML = '';
 }
 
 function attachTooltip(element, title, url) {
@@ -149,6 +156,55 @@ function createToolbarButton(title, url, isHistory = false, zoom = null, mobile 
   return btn;
 }
 
+function showHistoryContextMenu(event, title, url) {
+  event.preventDefault();
+  event.stopPropagation();
+  hideTooltip();
+
+  const isPinned = quickUrls.some((q) => q.url === url);
+  historyContextMenu.innerHTML = '';
+
+  const pinAction = document.createElement('button');
+  pinAction.type = 'button';
+  pinAction.className = 'context-menu-item';
+  pinAction.textContent = isPinned ? 'Unpin' : 'Pin';
+  pinAction.onclick = async (e) => {
+    e.stopPropagation();
+    await togglePin(title, url);
+    hideHistoryContextMenu();
+  };
+
+  const deleteAction = document.createElement('button');
+  deleteAction.type = 'button';
+  deleteAction.className = 'context-menu-item danger';
+  deleteAction.textContent = 'Delete';
+  deleteAction.onclick = async (e) => {
+    e.stopPropagation();
+    await removeHistoryItem(url);
+    hideHistoryContextMenu();
+  };
+
+  historyContextMenu.appendChild(pinAction);
+  historyContextMenu.appendChild(deleteAction);
+  historyContextMenu.style.display = 'block';
+
+  const menuRect = historyContextMenu.getBoundingClientRect();
+  let left = event.clientX;
+  let top = event.clientY;
+
+  if (left + menuRect.width > window.innerWidth - 4) {
+    left = window.innerWidth - menuRect.width - 4;
+  }
+  if (top + menuRect.height > window.innerHeight - 4) {
+    top = window.innerHeight - menuRect.height - 4;
+  }
+  if (left < 4) left = 4;
+  if (top < 4) top = 4;
+
+  historyContextMenu.style.left = `${left}px`;
+  historyContextMenu.style.top = `${top}px`;
+}
+
 
 /**
  * Update button tooltips/titles and favicons from settings
@@ -207,6 +263,7 @@ async function updateButtonUI() {
       
       const btn = createToolbarButton(hTitle, hUrl, true);
       attachTooltip(btn, hTitle, hUrl);
+      btn.oncontextmenu = (e) => showHistoryContextMenu(e, hTitle, hUrl);
       historyBtnsContainer.appendChild(btn);
     });
 
@@ -254,6 +311,7 @@ async function updateButtonUI() {
           updateIframe(hUrl);
           historyOverlay.style.display = 'none';
         };
+        divItem.oncontextmenu = (e) => showHistoryContextMenu(e, hTitle, hUrl);
         
         historyList.appendChild(divItem);
       });
@@ -313,6 +371,7 @@ async function initSidebar() {
 settingsBtn.onclick = () => {
   browser.runtime.openOptionsPage();
 };
+attachTooltip(addUrlBtn, 'Add / Search URL', 'Open URL entry and search overlay');
 attachTooltip(settingsBtn, 'Settings', 'Extension Options');
 
 reloadBtn.onclick = () => {
@@ -357,6 +416,7 @@ attachTooltip(openTabBtn, 'Open in New Tab', 'Open current page in a full browse
 // History Overlay Toggle
 historyDropdownBtn.onclick = (e) => {
   e.stopPropagation();
+  hideHistoryContextMenu();
   const isVisible = historyOverlay.style.display === 'flex';
   historyOverlay.style.display = isVisible ? 'none' : 'flex';
 };
@@ -368,6 +428,9 @@ closeHistoryBtn.onclick = () => {
 
 // Close overlays when clicking outside
 window.onclick = (e) => {
+  if (historyContextMenu.style.display === 'block' && !historyContextMenu.contains(e.target)) {
+    hideHistoryContextMenu();
+  }
   if (searchOverlay.style.display === 'flex' && !searchOverlayContent.contains(e.target) && !addUrlBtn.contains(e.target)) {
     searchOverlay.style.display = 'none';
   }
@@ -383,6 +446,24 @@ function initSearchOverlay(searchBaseUrl) {
     if (!isVisible) {
       searchInput.value = '';
       searchInput.focus();
+    }
+  };
+
+  openCurrentTabBtn.onclick = async () => {
+    try {
+      const activeTab = await browser.runtime.sendMessage({ type: 'GET_ACTIVE_TAB' });
+      if (!activeTab?.url) return;
+
+      updateIframe(activeTab.url);
+      browser.runtime.sendMessage({
+        type: 'ADD_HISTORY',
+        url: activeTab.url,
+        title: activeTab.title || activeTab.url
+      }).catch(() => {});
+
+      searchOverlay.style.display = 'none';
+    } catch (err) {
+      console.error('Failed to open current tab in sidebar:', err);
     }
   };
   
@@ -422,6 +503,7 @@ function initSearchOverlay(searchBaseUrl) {
 
 // Handle window resize to recalculate overflow
 window.onresize = () => {
+  hideHistoryContextMenu();
   updateButtonUI();
 };
 
@@ -489,6 +571,28 @@ async function togglePin(title, url) {
   await browser.storage.local.set({ quick_urls: currentQuick });
   // storage.onChanged will handle UI update
 }
+
+async function removeHistoryItem(url) {
+  const nextHistory = historyUrls.filter((item) => {
+    const itemUrl = (typeof item === 'string') ? item : item.url;
+    return itemUrl !== url;
+  });
+
+  await browser.storage.local.set({ history: nextHistory });
+}
+
+window.oncontextmenu = (e) => {
+  if (historyContextMenu.contains(e.target)) {
+    return;
+  }
+
+  if (e.target.closest('#history-btns-container') || e.target.closest('#history-list')) {
+    e.preventDefault();
+    return;
+  }
+
+  hideHistoryContextMenu();
+};
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', initSidebar);

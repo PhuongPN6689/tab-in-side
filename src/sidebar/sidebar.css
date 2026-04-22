@@ -247,6 +247,39 @@ body, html {
     color: #bdc1c6;
 }
 
+.context-menu {
+    position: fixed;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    padding: 6px;
+    z-index: 10001;
+}
+
+.context-menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #2f3136;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+}
+
+.context-menu-item:hover {
+    background: var(--btn-hover);
+}
+
+.context-menu-item.danger {
+    color: #c5221f;
+}
+
 /* Overlay Styles */
 .overlay {
     position: absolute;
@@ -287,6 +320,33 @@ body, html {
     font-size: 14px;
     outline: none;
     box-sizing: border-box;
+}
+
+.overlay-action-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d3d9e3;
+    border-radius: 10px;
+    background: #f5f8ff;
+    color: #174ea6;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.overlay-action-btn:hover {
+    background: #eaf1ff;
+    border-color: #b8c7ea;
+}
+
+.overlay-action-btn:active {
+    background: #dfe9ff;
+}
+
+.overlay-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .overlay-hints {
@@ -358,7 +418,8 @@ body, html {
     border-radius: 4px;
 }
 
-.dropdown-item:hover .pin-btn {
+.overlay-item:hover .pin-btn,
+.overlay-item:focus-within .pin-btn {
     opacity: 1;
 }
 

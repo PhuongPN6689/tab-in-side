@@ -149,6 +149,28 @@ async function addToHistory(url, title) {
   });
 }
 
+async function getActiveBrowserTab() {
+  const tabs = await browser.tabs.query({
+    active: true,
+    lastFocusedWindow: true
+  });
+
+  const activeTab = tabs.find((tab) => {
+    return tab.url &&
+      !tab.url.startsWith('about:') &&
+      !tab.url.startsWith('moz-extension:');
+  });
+
+  if (!activeTab || !activeTab.url) {
+    return null;
+  }
+
+  return {
+    url: activeTab.url,
+    title: activeTab.title || activeTab.url
+  };
+}
+
 // Listener for context menu clicks
 browser.menus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "open-in-sidebar" || info.menuItemId === "search-in-sidebar") {
@@ -210,5 +232,10 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "ADD_HISTORY") {
     addToHistory(message.url, message.title);
+    return;
+  }
+
+  if (message.type === "GET_ACTIVE_TAB") {
+    return getActiveBrowserTab();
   }
 });
